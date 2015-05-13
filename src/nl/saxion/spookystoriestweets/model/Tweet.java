@@ -26,5 +26,13 @@ public class Tweet {
 	public String getText(){
 		return this.text;
 	}
+	
+	public String getTimeStamp(){
+		return this.timestamp;
+	}
+	
+	public String getTag(){
+		return this.tag;
+	}
 
 }

@@ -33,6 +33,8 @@ public class CustomAdapter extends ArrayAdapter<Tweet>{
 	            holder = new ViewHolder();
 	            holder.tvTweeter = (TextView) v.findViewById(R.id.tvTweeter);
 	            holder.tvText = (TextView) v.findViewById(R.id.tvTweetedText);
+	            holder.tvTimeStamp = (TextView) v.findViewById(R.id.tvDateOfTweet);
+	            holder.tvTweeterTag = (TextView) v.findViewById(R.id.tvTweeterTag);
 	            // hier moeten nog meer textviews ed. bij
 
 	        
@@ -44,6 +46,8 @@ public class CustomAdapter extends ArrayAdapter<Tweet>{
 	        Tweet temp = data.get(position);
 	        holder.tvTweeter.setText(temp.getName());
 	        holder.tvText.setText(temp.getText());
+	        holder.tvTimeStamp.setText(temp.getTimeStamp());
+	        holder.tvTweeterTag.setText(temp.getTag());
 	        
 	        return v;
 	        }
@@ -51,6 +55,8 @@ public class CustomAdapter extends ArrayAdapter<Tweet>{
 	 static class ViewHolder{
 		 TextView tvTweeter;
 		 TextView tvText;
+		 TextView tvTimeStamp;
+		 TextView tvTweeterTag;
 	
 		 
 	 }

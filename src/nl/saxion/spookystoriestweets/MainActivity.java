@@ -33,6 +33,8 @@ public class MainActivity extends Activity implements Observer {
 	private ListView tweets;
 	private Model model;
 	private File file;
+	private AssetManager assetManager;
+	private String json;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,8 @@ public class MainActivity extends Activity implements Observer {
 		model = app.getModel();
 		model.addObserver(this);
 		
+		assetManager = getAssets();
+		
 		adapter = new CustomAdapter(this.getBaseContext(), R.layout.tweet, model.getData());
 		tweets = (ListView) findViewById(R.id.listView1);
 		tweets.setAdapter(adapter);
@@ -49,17 +53,18 @@ public class MainActivity extends Activity implements Observer {
 			// path naar json bestand staat in je workspace
 			file = new File("C:\\Users\\_\\Documents\\spookystoriestweets\\src\nl\\saxion\\spookystoriestweets\\json.txt");
 			
-			String json = readAssetIntoString("json.txt");
+			json = readAssetIntoString("json.txt");
 			
 			try {
 				JSONObject jObject;
 				jObject = new JSONObject(json);
 				JSONArray jArray = jObject.getJSONArray("statuses");
 				
-				for(int i = 0; i < jArray.length(); i++){
+			    for(int i = 1; i < jArray.length(); i++){
 					JSONObject temp;
 					temp = jArray.getJSONObject(i);
-					Tweet parsedTweet = new Tweet(temp.getString("name") ," ", temp.getString("text"), temp.getString("created_at"), 0 ,0);
+					JSONObject user = temp.getJSONObject("user");
+					Tweet parsedTweet = new Tweet(user.getString("name") , "@" + user.getString("screen_name") , temp.getString("text"), temp.getString("created_at"), 0 ,0);
 					model.addTweet(parsedTweet);
 
 					
@@ -81,7 +86,7 @@ public class MainActivity extends Activity implements Observer {
  
 		String line;
 		try {
-			InputStream is = getAssets().open(filename);
+			InputStream is = assetManager.open(filename);
 			br = new BufferedReader(new InputStreamReader(is));
 			while ((line = br.readLine()) != null) {
 			sb.append(line);
@@ -126,7 +131,6 @@ public class MainActivity extends Activity implements Observer {
 
 	@Override
 	public void update(Observable observable, Object data) {
-		tweets.setBackgroundColor(Color.BLACK);
 		adapter.notifyDataSetChanged();
 		
 		

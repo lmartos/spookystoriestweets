@@ -10,9 +10,7 @@ public class Model extends Observable {
 	private ArrayList<Tweet> tweets = new ArrayList<Tweet>();
 	private String filename;
 	
-	public Model(){
-		tweets.add(new Tweet("job", " ", "dit is een test", " ", 0 , 0));
-	}
+
 	
 	public void addTweet(Tweet tweet){
 		tweets.add(tweet);
