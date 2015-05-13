@@ -16,6 +16,7 @@ public class Model extends Observable {
 	
 	public void addTweet(Tweet tweet){
 		tweets.add(tweet);
+		
 		setChanged();
 		notifyObservers();
 	}
