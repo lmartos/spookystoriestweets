@@ -18,5 +18,13 @@ public class Tweet {
 		this.favorites = favorites;
 		
 	}
+	
+	public String getName(){
+		return this.name;
+	}
+	
+	public String getText(){
+		return this.text;
+	}
 
 }
