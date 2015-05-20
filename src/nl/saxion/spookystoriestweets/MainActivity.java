@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,6 +47,9 @@ public class MainActivity extends Activity implements Observer {
 		
 		assetManager = getAssets();
 		
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+		
 		adapter = new CustomAdapter(this.getBaseContext(), R.layout.tweet, model.getData());
 		tweets = (ListView) findViewById(R.id.listView1);
 		tweets.setAdapter(adapter);
@@ -60,11 +64,18 @@ public class MainActivity extends Activity implements Observer {
 				jObject = new JSONObject(json);
 				JSONArray jArray = jObject.getJSONArray("statuses");
 				
-			    for(int i = 1; i < jArray.length(); i++){
+			    for(int i = 0; i < jArray.length(); i++){
 					JSONObject temp;
 					temp = jArray.getJSONObject(i);
 					JSONObject user = temp.getJSONObject("user");
-					Tweet parsedTweet = new Tweet(user.getString("name") , "@" + user.getString("screen_name") , temp.getString("text"), temp.getString("created_at"), 0 ,0);
+					
+					
+					if (temp.getString("text").contains("RT @")){
+					JSONObject retweet = temp.getJSONObject("retweeted_status");
+					user = retweet.getJSONObject("user");
+					}
+					
+					Tweet parsedTweet = new Tweet(user.getString("name") , "@" + user.getString("screen_name") , temp.getString("text"), temp.getString("created_at"), user.getString("profile_image_url"), 0 ,0);
 					model.addTweet(parsedTweet);
 
 					

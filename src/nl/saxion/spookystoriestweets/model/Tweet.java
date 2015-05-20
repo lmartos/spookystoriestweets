@@ -6,21 +6,27 @@ public class Tweet {
 	private String tag;
 	private String text;
 	private String timestamp;
+	private String avatarURL;
 	private int retweets;
 	private int favorites;
 	
-	public Tweet (String name, String tag, String text, String timestamp, int retweets, int favorites){
+	public Tweet (String name, String tag, String text, String timestamp, String avatarURL, int retweets, int favorites){
 		this.name = name;
 		this.tag = tag;
 		this.text = text;
 		this.timestamp = timestamp;
 		this.retweets = retweets;
 		this.favorites = favorites;
+		this.avatarURL = avatarURL;
 		
 	}
 	
 	public String getName(){
 		return this.name;
+	}
+	
+	public String getAvatarURL(){
+		return avatarURL;
 	}
 	
 	public String getText(){
