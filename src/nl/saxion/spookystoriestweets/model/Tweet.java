@@ -7,6 +7,7 @@ public class Tweet {
 	private String text;
 	private String timestamp;
 	private String avatarURL;
+	private String retweetedBy;
 	private int retweets;
 	private int favorites;
 	
@@ -23,6 +24,14 @@ public class Tweet {
 	
 	public String getName(){
 		return this.name;
+	}
+	
+	public void setRetweetedBy(String retweetedBy){
+		this.retweetedBy = retweetedBy;
+	}
+	
+	public String getRetweetedBy(){
+		return this.retweetedBy;
 	}
 	
 	public String getAvatarURL(){

@@ -25,9 +25,11 @@ import android.widget.TextView;
 public class CustomAdapter extends ArrayAdapter<Tweet>{
 	
 	private ArrayList<Tweet> data;
+	private Context context;
 
 	public CustomAdapter(Context context, int resource, List<Tweet> objects) {
 		super(context, resource, objects);
+		this.context = context;
 		data = (ArrayList<Tweet>) objects;
 	}
 	
@@ -45,7 +47,9 @@ public class CustomAdapter extends ArrayAdapter<Tweet>{
 	            holder.tvText = (TextView) v.findViewById(R.id.tvTweetedText);
 	            holder.tvTimeStamp = (TextView) v.findViewById(R.id.tvDateOfTweet);
 	            holder.tvTweeterTag = (TextView) v.findViewById(R.id.tvTweeterTag);
-	            holder.avatar = (ImageView) v.findViewById(R.id.ivAvatar);
+	            holder.tvRetweetedBy = (TextView) v.findViewById(R.id.tvRetweetedBy);
+	            
+	            holder.ivAvatar = (ImageView) v.findViewById(R.id.ivAvatar);
 	            // hier moeten nog meer textviews ed. bij
 
 	        
@@ -59,8 +63,9 @@ public class CustomAdapter extends ArrayAdapter<Tweet>{
 	        holder.tvText.setText(temp.getText());
 	        holder.tvTimeStamp.setText(temp.getTimeStamp());
 	        holder.tvTweeterTag.setText(temp.getTag());
+	        holder.tvRetweetedBy.setText(temp.getRetweetedBy());
 	        
-	        holder.avatar.setImageBitmap(getImageBitmap(temp.getAvatarURL()));
+	        holder.ivAvatar.setImageBitmap(getImageBitmap(temp.getAvatarURL()));
 	        
 	        return v;
 	        }
@@ -77,7 +82,10 @@ public class CustomAdapter extends ArrayAdapter<Tweet>{
 	            bis.close();
 	            is.close();
 	       } catch (IOException e) {
-	           Log.d("error", "error downloading image");
+	    	   int resourceId = R.drawable.default_avatar;
+	    	   Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), resourceId);
+	    	   return bmp;
+	           
 	       }
 	       return bm;
 	    } 
@@ -87,7 +95,8 @@ public class CustomAdapter extends ArrayAdapter<Tweet>{
 		 TextView tvText;
 		 TextView tvTimeStamp;
 		 TextView tvTweeterTag;
-		 ImageView avatar;
+		 TextView tvRetweetedBy;
+		 ImageView ivAvatar;
 	
 		 
 	 }

@@ -66,16 +66,26 @@ public class MainActivity extends Activity implements Observer {
 				
 			    for(int i = 0; i < jArray.length(); i++){
 					JSONObject temp;
+					JSONObject retweeter = null;
+					Boolean retweeted = false;
 					temp = jArray.getJSONObject(i);
 					JSONObject user = temp.getJSONObject("user");
 					
 					
+					
 					if (temp.getString("text").contains("RT @")){
+					retweeter = temp.getJSONObject("user");
+					retweeted = true;
 					JSONObject retweet = temp.getJSONObject("retweeted_status");
 					user = retweet.getJSONObject("user");
 					}
 					
 					Tweet parsedTweet = new Tweet(user.getString("name") , "@" + user.getString("screen_name") , temp.getString("text"), temp.getString("created_at"), user.getString("profile_image_url"), 0 ,0);
+					
+					if(retweeted){
+						parsedTweet.setRetweetedBy("Retweeted By: " + retweeter.getString("name"));
+					}
+					
 					model.addTweet(parsedTweet);
 
 					
