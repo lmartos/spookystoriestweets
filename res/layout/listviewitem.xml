@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical" >
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_height="wrap_content" >
 
         <ImageView
             android:id="@+id/ivUserImage"
@@ -17,8 +16,8 @@
 
         <LinearLayout
             android:id="@+id/llDisplayTweet"
-            android:layout_width="169dp"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="vertical" >
 
             <TextView
@@ -28,58 +27,36 @@
                 android:text="TextView" />
 
             <TextView
-                android:id="@+id/tvTweeterTag"
-                android:layout_width="183dp"
+                android:id="@+id/tvTweet"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="tag"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:text="TextView" />
+
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btFollow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Follow" />
     </LinearLayout>
-
-
-     <TextView
-        android:id="@+id/tvTweet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-
-    <TextView
-        android:id="@+id/tvDateOfTweet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="00:00 PM - 01 Jan 2015"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
         <Button
-            android:id="@+id/btComment"
-            style="?android:attr/buttonStyleSmall"
+            android:id="@+id/button1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Comment" />
+            android:text="Button" />
 
         <Button
-            android:id="@+id/btRetweet"
-            style="?android:attr/buttonStyleSmall"
+            android:id="@+id/button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Retweet" />
+            android:text="Button" />
 
         <Button
-            android:id="@+id/btFavorite"
-            style="?android:attr/buttonStyleSmall"
+            android:id="@+id/button3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Favorite" />
+            android:text="Button" />
 
     </LinearLayout>
 
