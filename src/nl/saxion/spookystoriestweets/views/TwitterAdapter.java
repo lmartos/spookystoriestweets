@@ -102,7 +102,7 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 			}
 		}
 
-		user.setText(currentUser.getScreenName());
+		user.setText("@"+currentUser.getScreenName());
 		tweetText.setText(sbTweet);
 		tweetText.setMovementMethod(LinkMovementMethod.getInstance());
 

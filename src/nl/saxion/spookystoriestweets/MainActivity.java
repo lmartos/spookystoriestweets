@@ -60,7 +60,6 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				RetrieveTweets getTweets = new RetrieveTweets();
 				String searchString = etSearchTerm.getText() + "";
-				btnSearch.setText("Searching ...");
 				btnSearch.setEnabled(false);
 				getTweets.execute(URLEncoder.encode(searchString));
 				lvTweets.setSelectionAfterHeaderView();
@@ -144,7 +143,6 @@ public class MainActivity extends Activity {
 		@Override
 		protected void onPostExecute(String result) {
 			model.setJson(result);
-			btnSearch.setText("Search");
 			btnSearch.setEnabled(true);
 			super.onPostExecute(result);
 		}
