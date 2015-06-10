@@ -3,20 +3,19 @@
     package="nl.saxion.spookystoriestweets"
     android:versionCode="1"
     android:versionName="1.0" >
-    
-    <uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    
     <uses-sdk
         android:minSdkVersion="19"
-        android:targetSdkVersion="19" />
+        android:targetSdkVersion="21" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:name="nl.saxion.spookystoriestweets.TweetApplication"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme" 
+        android:name="nl.saxion.spookystoriestweets.controller.TwitterApplication" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >

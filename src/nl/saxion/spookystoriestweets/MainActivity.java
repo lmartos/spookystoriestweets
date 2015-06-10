@@ -1,159 +1,164 @@
 package nl.saxion.spookystoriestweets;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Observable;
-import java.util.Observer;
+import java.net.URLEncoder;
 
-import nl.saxion.spookystoriestweets.model.Model;
-import nl.saxion.spookystoriestweets.model.Tweet;
-import nl.saxion.spookystoriestweets.view.CustomAdapter;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
+import android.app.ActionBar;
 import android.app.Activity;
-import android.content.res.AssetManager;
-import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
+import android.util.Base64;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
-public class MainActivity extends Activity implements Observer {
-	
-	private CustomAdapter adapter;
-	private ListView tweets;
-	private Model model;
-	private File file;
-	private AssetManager assetManager;
-	private String json;
 
+import nl.saxion.spookystoriestweets.controller.TwitterApplication;
+import nl.saxion.spookystoriestweets.model.Model;
+import nl.saxion.spookystoriestweets.view.TwitterAdapter;
+
+public class MainActivity extends Activity {
+
+	private static final String APIKEY = "D7eeHiP0mPYd1RCHdu3aDsoFT";
+	private static final String APISECRET = "DL9Wju1bRMdllWsbKAOSH4WlgZ1AA04hw48JjdSlrk0JRpSKb9";
+	private static String bearerToken = "";
+	
+	private Model model;
+	private EditText etSearchTerm;
+	private ListView lvTweets;
+	Button btnSearch;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		TweetApplication app = (TweetApplication) getApplicationContext();
-		model = app.getModel();
-		model.addObserver(this);
+		hideActionBar();
+		// Haal het model op vanuit de applicationContext
+		model = ((TwitterApplication) getBaseContext().getApplicationContext()).getModel();		
+		// Koppel de juiste controls aan de variabelen
+		lvTweets = (ListView) findViewById(R.id.lvTweets);
+		btnSearch = (Button) findViewById(R.id.btnSearch);
+		etSearchTerm = (EditText) findViewById(R.id.etSearchTerm);
+		// Genereer het bearertoken
+		generateOAUTHToken();
+		// Maak een instantie van de adapter en koppel deze aan de listview
+		TwitterAdapter adapter = new TwitterAdapter(this, model.getTweets());
+		model.addObserver(adapter);
+		lvTweets.setAdapter(adapter);
 		
-		assetManager = getAssets();
-		
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-		
-		adapter = new CustomAdapter(this.getBaseContext(), R.layout.tweet, model.getData());
-		tweets = (ListView) findViewById(R.id.listView1);
-		tweets.setAdapter(adapter);
-		
-			// path naar json bestand staat in je workspace
-			file = new File("C:\\Users\\_\\Documents\\spookystoriestweets\\src\nl\\saxion\\spookystoriestweets\\json.txt");
-			
-			json = readAssetIntoString("json.txt");
-			
-			try {
-				JSONObject jObject;
-				jObject = new JSONObject(json);
-				JSONArray jArray = jObject.getJSONArray("statuses");
-				
-			    for(int i = 0; i < jArray.length(); i++){
-					JSONObject temp;
-					JSONObject retweeter = null;
-					Boolean retweeted = false;
-					temp = jArray.getJSONObject(i);
-					JSONObject user = temp.getJSONObject("user");
-					
-					
-					
-					if (temp.getString("text").contains("RT @")){
-					retweeter = temp.getJSONObject("user");
-					retweeted = true;
-					JSONObject retweet = temp.getJSONObject("retweeted_status");
-					user = retweet.getJSONObject("user");
-					}
-					
-					Tweet parsedTweet = new Tweet(user.getString("name") , "@" + user.getString("screen_name") , temp.getString("text"), temp.getString("created_at"), user.getString("profile_image_url"), 0 ,0);
-					
-					if(retweeted){
-						parsedTweet.setRetweetedBy("Retweeted By: " + retweeter.getString("name"));
-					}
-					
-					model.addTweet(parsedTweet);
-
-					
-				}
-			} catch (JSONException e) {
-				Log.d("error" , "json exception");
-				e.printStackTrace();
+		btnSearch.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				GetTweetsFromInputTask getTweets = new GetTweetsFromInputTask();
+				String searchString = etSearchTerm.getText() + "";
+				btnSearch.setText("Searching ...");
+				btnSearch.setEnabled(false);
+				getTweets.execute(URLEncoder.encode(searchString));
+				lvTweets.setSelectionAfterHeaderView();
 			}
-			
-			
-		
-		
-		
+		});
 	}
 	
-	private String readAssetIntoString(String filename) {
-		BufferedReader br = null;
-		StringBuilder sb = new StringBuilder();
- 
-		String line;
-		try {
-			InputStream is = assetManager.open(filename);
-			br = new BufferedReader(new InputStreamReader(is));
-			while ((line = br.readLine()) != null) {
-			sb.append(line);
+
+	private void generateOAUTHToken() {
+		String authString = APIKEY + ":" + APISECRET;
+		String base64 = Base64.encodeToString(authString.getBytes(),
+				Base64.NO_WRAP);
+
+		GenerateTokenTask task = new GenerateTokenTask();
+		task.execute(base64);
+	}
+	
+	public class GenerateTokenTask extends AsyncTask<String, Void, String> {
+		private HttpResponse response;
+
+		@Override
+		protected String doInBackground(String... params) {
+			Log.d("json", "doInBackground GenerateTokenTask");
+			HttpPost request = new HttpPost(
+					"https://api.twitter.com/oauth2/token");
+			request.setHeader("Authorization", "Basic " + params[0]);
+			request.setHeader("Content-Type",
+					"application/x-www-form-urlencoded;charset=UTF-8");
+			String token = "";
+			try {
+				request.setEntity(new StringEntity(
+						"grant_type=client_credentials"));
+				HttpClient client = new DefaultHttpClient();
+				response = client.execute(request);
+
+				String responseString = new BasicResponseHandler()
+						.handleResponse(response);
+				
+				JSONObject jsonO = new JSONObject(responseString);
+				token = jsonO.getString("access_token");
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			Log.d("error" , "ioexception");
-			Log.d("error" , e.getMessage());
-			
-           // throw e;
-		} finally {
-			if (br != null) {
+			return token;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			bearerToken = result;
+		
+
+			super.onPostExecute(result);
+		}
+
+	}
+	
+	public class GetTweetsFromInputTask extends AsyncTask<String, Void, String> {
+		private HttpResponse response;
+		@Override
+		protected String doInBackground(String... params) {
+			Log.d("json", "doInBackground GetTweetsFromInputTask");
+			String searchJSON = "";
+			if (!params[0].equals("")) {
+				HttpClient client = new DefaultHttpClient();
+				HttpGet httpGet = new HttpGet(
+						"https://api.twitter.com/1.1/search/tweets.json?q="
+								+ params[0]);
+				httpGet.setHeader("Authorization", "Bearer " + bearerToken);				
 				try {
-					br.close();
-				} catch (IOException e) {
+					ResponseHandler<String> handler = new BasicResponseHandler();
+					response = client.execute(httpGet);
+					searchJSON = handler.handleResponse(response);
+					Log.d("json", searchJSON);
+				} catch (Exception e){
 					e.printStackTrace();
-					Log.d("error" , "ioexception2");
 				}
-			}
+			} 
+			return searchJSON;		
 		}
-		return sb.toString();		
-	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+		@Override
+		protected void onPostExecute(String result) {
+			model.setJson(result);
+			btnSearch.setText("Search");
+			btnSearch.setEnabled(true);
+			super.onPostExecute(result);
 		}
-		return super.onOptionsItemSelected(item);
-	}
 
-	@Override
-	public void update(Observable observable, Object data) {
-		adapter.notifyDataSetChanged();
-		
-		
 	}
+	
+	private void hideActionBar() {
+		ActionBar actionBar = getActionBar();
+		actionBar.hide();
+	}
+	
+	
 }
