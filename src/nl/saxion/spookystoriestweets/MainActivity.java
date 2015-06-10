@@ -46,15 +46,15 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		hideActionBar();
-		// Haal het model op vanuit de applicationContext
+	
 		model = ((TwitterApplication) getBaseContext().getApplicationContext()).getModel();		
-		// Koppel de juiste controls aan de variabelen
+	
 		lvTweets = (ListView) findViewById(R.id.lvTweets);
 		btnSearch = (Button) findViewById(R.id.btnSearch);
 		etSearchTerm = (EditText) findViewById(R.id.etSearchTerm);
-		// Genereer het bearertoken
-		generateOAUTHToken();
-		// Maak een instantie van de adapter en koppel deze aan de listview
+	
+		OauthToken();
+	
 		TwitterAdapter adapter = new TwitterAdapter(this, model.getTweets());
 		model.addObserver(adapter);
 		lvTweets.setAdapter(adapter);
@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
 		btnSearch.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				GetTweetsFromInputTask getTweets = new GetTweetsFromInputTask();
+				RetrieveTweets getTweets = new RetrieveTweets();
 				String searchString = etSearchTerm.getText() + "";
 				btnSearch.setText("Searching ...");
 				btnSearch.setEnabled(false);
@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
 	}
 	
 
-	private void generateOAUTHToken() {
+	private void OauthToken() {
 		String authString = APIKEY + ":" + APISECRET;
 		String base64 = Base64.encodeToString(authString.getBytes(),
 				Base64.NO_WRAP);
@@ -121,7 +121,7 @@ public class MainActivity extends Activity {
 
 	}
 	
-	public class GetTweetsFromInputTask extends AsyncTask<String, Void, String> {
+	public class RetrieveTweets extends AsyncTask<String, Void, String> {
 		private HttpResponse response;
 		@Override
 		protected String doInBackground(String... params) {

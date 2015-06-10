@@ -2,7 +2,6 @@ package nl.saxion.spookystoriestweets.controller;
 
 import android.app.Application;
 
-
 import nl.saxion.spookystoriestweets.model.Model;
 
 public class TwitterApplication extends Application {

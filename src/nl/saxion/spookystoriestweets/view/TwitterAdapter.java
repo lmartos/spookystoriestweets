@@ -67,8 +67,7 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 		sbTweet = new SpannableStringBuilder(currentTweet.getTweetText());
 		int hashtagC = Color.rgb(26, 13, 131);
 		
-		/** VAN CASPER... HOE WERKT DIT PRECIES?? */
-		/** Het lijkt erop dat dit ervoor zorgt dat de imageview maar 1x per view word aangemaakt */
+		
 		for (int i = 0; i < ll.getChildCount(); i++) {
 			if (ll.getChildAt(i) instanceof ImageView) {
 				ImageView imageView = (ImageView) ll.getChildAt(i);
@@ -81,7 +80,6 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 				sbTweet.setSpan(new ForegroundColorSpan(hashtagC), ent.getIndex(1), ent.getIndex(2), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			}
 			if (ent instanceof Url) {
-				//sbTweet.setSpan(new ForegroundColorSpan(urlC), ent.getIndex(1), ent.getIndex(2), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				final Url url = (Url) ent;
 				ClickableSpan clickableSpan = new ClickableSpan() {
 					
@@ -97,7 +95,7 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 			if (ent instanceof Media)  {
 				Bitmap image = ((Media) ent).getPicture();
 				if (image == null) {
-					downloadImagesFromTwitterTask task = new downloadImagesFromTwitterTask(ent);
+					GetImages task = new GetImages(ent);
 					task.execute(((Media) ent).getMediaURL());
 				} else {
 					ImageView view = new ImageView(context);
@@ -121,11 +119,11 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 		notifyDataSetChanged();		
 	}
 	
-	private class downloadImagesFromTwitterTask extends AsyncTask<String, Void, Bitmap> {
+	private class GetImages extends AsyncTask<String, Void, Bitmap> {
 
 		private Media media;
 		
-		public downloadImagesFromTwitterTask(Entity ent) {
+		public GetImages(Entity ent) {
 			media = (Media) ent;
 		}
 		
@@ -152,8 +150,8 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 	public void updateList() {
 		notifyDataSetChanged();
 	}
-	/** VOOR DE USER IMAGES */
-	public Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
+
+	public Bitmap scaleBitmap(Bitmap scaleBitmapImage) {
 	    int targetWidth = 120;
 	    int targetHeight = 120;
 	    Bitmap targetBitmap = Bitmap.createBitmap(targetWidth, 

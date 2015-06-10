@@ -2,15 +2,17 @@ package nl.saxion.spookystoriestweets;
 
 import java.util.*;
 
+
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONException;
+
 
 import java.util.Observable;
 
 public class Tweet extends Observable implements Observer{
 
-	private String tweetText, tweetDate;
+	private String tweetedText, tweetDate;
 	private User user;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private JSONArray hashtags, urls, media;
@@ -18,13 +20,13 @@ public class Tweet extends Observable implements Observer{
 	public Tweet (JSONObject tweetObj) throws JSONException {
 		user = new User(tweetObj.getJSONObject("user"));
 		user.addObserver(this);
-		tweetText = tweetObj.getString("text");
+		tweetedText = tweetObj.getString("text");
 		tweetDate = tweetObj.getString("created_at");
 		
-		/** Entities uitlezen */
+		
 		JSONObject entityObj = tweetObj.getJSONObject("entities");
 		
-		/** JSONArrays opbouwen */
+	
 		if (entityObj.has("hashtags")) {
 			hashtags = entityObj.getJSONArray("hashtags");
 			for (int i = 0; i < hashtags.length(); i++) {
@@ -46,7 +48,7 @@ public class Tweet extends Observable implements Observer{
 	}
 	
 	public String getTweetText() {
-		return this.tweetText;
+		return this.tweetedText;
 	}
 
 	@Override

@@ -14,13 +14,9 @@ public class Entity {
 		}
 	}
 	
-	/**
-	 * getIndex returns the index of the entity
-	 * @param index select the first or the second index
-	 * @return the selected index
-	 */
+	
 	public int getIndex(int index) {
-		assert index == 1 || index == 2 : "Geen juiste index meegegeven";
+		assert index == 1 || index == 2 : "Wrong indices";
 		if (index == 1)
 			return indices.get(0);
 		else
