@@ -2,6 +2,8 @@ package nl.saxion.spookystoriestweets;
 
 import java.net.URLEncoder;
 
+
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -12,12 +14,14 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
-import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -41,7 +45,6 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		hideActionBar();
 	
 		model = ((SpookyStoriesTweetsApplication) getBaseContext().getApplicationContext()).getModel();		
 	
@@ -148,11 +151,29 @@ public class MainActivity extends Activity {
 		}
 
 	}
-	
-	private void hideActionBar() {
-		ActionBar actionBar = getActionBar();
-		actionBar.hide();
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
 	}
 	
-	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		int id = item.getItemId();
+
+		if (id == R.id.mainTimeline) {
+			return true;
+		}
+
+		else if (id == R.id.mainProfile) {
+			Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+			startActivity(intent);
+			finish();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
 }

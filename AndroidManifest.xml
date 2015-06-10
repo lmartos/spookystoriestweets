@@ -5,16 +5,17 @@
     android:versionName="1.0" >
 
     <uses-permission android:name="android.permission.INTERNET" />
-    
+
     <uses-sdk
         android:minSdkVersion="19"
         android:targetSdkVersion="21" />
 
     <application
+        android:name=".SpookyStoriesTweetsApplication"
         android:allowBackup="true"
+        android:icon="@drawable/twittericon"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" 
-        android:name="nl.saxion.spookystoriestweets.SpookyStoriesTweetsApplication" >
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -23,6 +24,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ProfileActivity"
+            android:label="Profile" >
         </activity>
     </application>
 
