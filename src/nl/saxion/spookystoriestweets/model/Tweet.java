@@ -1,12 +1,10 @@
-package nl.saxion.spookystoriestweets;
+package nl.saxion.spookystoriestweets.model;
 
 import java.util.*;
-
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
-
 
 import java.util.Observable;
 

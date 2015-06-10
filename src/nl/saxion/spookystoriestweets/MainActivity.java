@@ -2,7 +2,6 @@ package nl.saxion.spookystoriestweets;
 
 import java.net.URLEncoder;
 
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -24,11 +23,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-
-
-import nl.saxion.spookystoriestweets.controller.TwitterApplication;
 import nl.saxion.spookystoriestweets.model.Model;
-import nl.saxion.spookystoriestweets.view.TwitterAdapter;
+import nl.saxion.spookystoriestweets.views.TwitterAdapter;
 
 public class MainActivity extends Activity {
 
@@ -47,7 +43,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		hideActionBar();
 	
-		model = ((TwitterApplication) getBaseContext().getApplicationContext()).getModel();		
+		model = ((SpookyStoriesTweetsApplication) getBaseContext().getApplicationContext()).getModel();		
 	
 		lvTweets = (ListView) findViewById(R.id.lvTweets);
 		btnSearch = (Button) findViewById(R.id.btnSearch);

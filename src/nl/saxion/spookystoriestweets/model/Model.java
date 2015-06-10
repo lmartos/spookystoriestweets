@@ -1,7 +1,6 @@
 package nl.saxion.spookystoriestweets.model;
 
 import java.util.ArrayList;
-
 import java.util.Observable;
 import java.util.Observer;
 
@@ -9,23 +8,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import nl.saxion.spookystoriestweets.Tweet;
-
 public class Model extends Observable implements Observer {
 	
-	private ArrayList<Tweet> listOfTweets = new ArrayList<Tweet>();
+	private ArrayList<Tweet> Tweets = new ArrayList<Tweet>();
 	private String json = "";
 	
-	public void setJson(String _json) {
-		this.json = _json;
+	public void setJson(String json) {
+		this.json = json;
 		buildTweetList();
 		setChanged();
 		notifyObservers();
 	}
 	
 	public void buildTweetList() {
-		// Maak de lijst leeg zodat je alleen de nieuwe gegevens ziet
-		listOfTweets.clear();
+	
+		Tweets.clear();
 		try {
 			JSONObject result = new JSONObject(this.json);
 			JSONArray jsonStatus = result.getJSONArray("statuses");
@@ -40,11 +37,11 @@ public class Model extends Observable implements Observer {
 	
 	private void addTweet(Tweet tweet) {
 		tweet.addObserver(this);
-		listOfTweets.add(tweet);
+		Tweets.add(tweet);
 	}
 	
 	public ArrayList<Tweet> getTweets() {
-		return this.listOfTweets;
+		return this.Tweets;
 	}
 	
 	@Override

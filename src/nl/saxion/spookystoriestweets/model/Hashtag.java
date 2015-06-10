@@ -1,4 +1,4 @@
-package nl.saxion.spookystoriestweets;
+package nl.saxion.spookystoriestweets.model;
 
 import org.json.JSONException;
 import org.json.JSONObject;
