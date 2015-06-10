@@ -8,6 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="#99CCFF"
     tools:context="nl.saxion.spookystoriestweets.ProfileActivity" >
 
     <ImageView
@@ -34,7 +35,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content" 
+        android:background="#66B2FF">
 
         <TextView
             android:id="@+id/textView3"
@@ -63,12 +65,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:background="#66B2FF" >
 
         <Button
             android:id="@+id/button2"
-            android:layout_width="55dp"
-            android:layout_height="wrap_content"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:layout_marginRight="190dp"
             android:background="@drawable/settingsicon" />
 

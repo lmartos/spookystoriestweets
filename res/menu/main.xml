@@ -4,12 +4,12 @@
 
 	<item
         android:id="@+id/mainTimeline"
-        android:icon="@drawable/twittericon"
+        android:icon="@drawable/ic_list"
         android:showAsAction="always"
         android:title="All contacts"/> 	
 	<item
         android:id="@+id/mainProfile"
-        android:icon="@drawable/profile"
+        android:icon="@drawable/ic_contact"
         android:showAsAction="always"
         android:title="Favorites"/>
 
