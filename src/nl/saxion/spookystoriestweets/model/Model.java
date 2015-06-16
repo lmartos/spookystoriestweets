@@ -11,6 +11,7 @@ import org.json.JSONObject;
 public class Model extends Observable implements Observer {
 	
 	private ArrayList<Tweet> Tweets = new ArrayList<Tweet>();
+	private ArrayList<Tweet> timeline = new ArrayList<Tweet>();
 	private String json = "";
 	
 	public void setJson(String json) {
@@ -38,6 +39,16 @@ public class Model extends Observable implements Observer {
 	private void addTweet(Tweet tweet) {
 		tweet.addObserver(this);
 		Tweets.add(tweet);
+	}
+	
+	public void addToTimeline(Tweet tweet){
+		this.timeline.add(tweet);
+		setChanged();
+		notifyObservers();
+	}
+	
+	public ArrayList<Tweet> getTimeline(){
+		return this.timeline;
 	}
 	
 	public ArrayList<Tweet> getTweets() {

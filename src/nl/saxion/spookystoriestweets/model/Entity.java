@@ -1,5 +1,6 @@
 package nl.saxion.spookystoriestweets.model;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
@@ -14,6 +15,11 @@ public class Entity {
 		}
 	}
 	
+	public Entity (int start, int end){
+		indices.add(start);
+		indices.add(end);
+	}
+	
 	
 	public int getIndex(int index) {
 		assert index == 1 || index == 2 : "Wrong indices";
@@ -22,4 +28,6 @@ public class Entity {
 		else
 			return indices.get(1);
 	}
+	
+	
 }

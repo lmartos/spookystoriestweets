@@ -97,13 +97,7 @@ public class MainActivity extends Activity {
 		});
 	}
 	
-	@Override
-	public void onResume(){
-		super.onResume();
-		updateLogin();
-		
-		
-	}
+	
 	
 	public void updateLogin(){
 		
@@ -202,8 +196,16 @@ public class MainActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		this.menu = menu;
-		loginItem = (MenuItem) menu.findItem(R.id.mainLogin);
+		
 		return true;
+	}
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu){
+		super.onPrepareOptionsMenu(menu);
+		loginItem = (MenuItem) menu.findItem(R.id.mainLogin);
+		updateLogin();
+		return true;
+		
 	}
 	
 	@Override

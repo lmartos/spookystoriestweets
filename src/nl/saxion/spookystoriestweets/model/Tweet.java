@@ -6,6 +6,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import twitter4j.HashtagEntity;
+import twitter4j.MediaEntity;
+import twitter4j.Status;
+import twitter4j.URLEntity;
+
 import java.util.Observable;
 
 public class Tweet extends Observable implements Observer{
@@ -43,6 +48,35 @@ public class Tweet extends Observable implements Observer{
 				entities.add(new Media(media.getJSONObject(i)));
 			}
 		}		
+	}
+	
+	public Tweet(Status status){
+		this.user = new User(status.getUser());
+		user.addObserver(this);
+		this.tweetedText = status.getText();
+		this.tweetDate = status.getCreatedAt().toString();
+		
+		
+		
+		if(status.getHashtagEntities().length > 0){
+			for(HashtagEntity h : status.getHashtagEntities()){
+				entities.add(new Hashtag(h));
+			}
+
+		}
+		
+		if(status.getURLEntities().length > 0){
+			for(URLEntity u: status.getURLEntities()){
+				entities.add(new Url(u));
+			}
+		}
+		
+		if(status.getMediaEntities().length > 0){
+			for(MediaEntity m : status.getMediaEntities()){
+				
+			}
+		}
+		
 	}
 	
 	public String getTweetText() {

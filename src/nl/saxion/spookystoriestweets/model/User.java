@@ -19,6 +19,12 @@ public class User extends Observable {
 		pictureURL =  userObject.getString("profile_image_url");
 	}
 	
+	public User(twitter4j.User user){
+		this.userName = user.getName();
+		this.screenName = user.getScreenName();
+		this.pictureURL = user.getProfileImageURL();
+	}
+	
 	public String getUserName() {
 		return userName;
 	}

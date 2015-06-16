@@ -18,6 +18,7 @@ import android.text.SpannableStringBuilder;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 	private Context context;
 
 	public TwitterAdapter(Context context, ArrayList<Tweet> listOfTweets) {
-		super(context, 0, listOfTweets);
+		super(context, R.layout.listviewitem, listOfTweets);
 		this.context = context;
 	}
 
@@ -104,6 +105,7 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 
 		user.setText("@"+currentUser.getScreenName());
 		tweetText.setText(sbTweet);
+		Log.d("ADAPTER!!!", sbTweet.toString());
 		tweetText.setMovementMethod(LinkMovementMethod.getInstance());
 
 		return convertView;
