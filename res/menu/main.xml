@@ -12,5 +12,11 @@
         android:icon="@drawable/ic_contact"
         android:showAsAction="always"
         android:title="Favorites"/>
+	
+	<item
+        android:id="@+id/mainLogin"
+        android:icon="@drawable/ic_launcher"
+        android:showAsAction="never"
+        android:title="Login"/>
 
 </menu>

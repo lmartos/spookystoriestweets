@@ -4,6 +4,16 @@ import java.net.URLEncoder;
 
 
 
+
+
+
+
+
+
+
+
+import oauth.signpost.OAuth;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -14,10 +24,20 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
+
+
+
+
+
 import android.app.Activity;
+import android.content.ClipData.Item;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -37,20 +57,27 @@ public class MainActivity extends Activity {
 	private static String bearerToken = "";
 	
 	private Model model;
+	private Menu menu;
 	private EditText etSearchTerm;
 	private ListView lvTweets;
+	private SharedPreferences prefs;
+	private MenuItem loginItem;
 	Button btnSearch;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-	
+		this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+		
 		model = ((SpookyStoriesTweetsApplication) getBaseContext().getApplicationContext()).getModel();		
 	
 		lvTweets = (ListView) findViewById(R.id.lvTweets);
 		btnSearch = (Button) findViewById(R.id.btnSearch);
 		etSearchTerm = (EditText) findViewById(R.id.etSearchTerm);
+		
 	
 		OauthToken();
 	
@@ -68,6 +95,23 @@ public class MainActivity extends Activity {
 				lvTweets.setSelectionAfterHeaderView();
 			}
 		});
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		updateLogin();
+		
+		
+	}
+	
+	public void updateLogin(){
+		
+		if (TwitterUtils.isAuthenticated(prefs)) {
+			loginItem.setTitle("Logout");
+		}else{
+			loginItem.setTitle("Login");
+		}
 	}
 	
 
@@ -142,6 +186,8 @@ public class MainActivity extends Activity {
 			} 
 			return searchJSON;		
 		}
+		
+		
 
 		@Override
 		protected void onPostExecute(String result) {
@@ -155,6 +201,8 @@ public class MainActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		this.menu = menu;
+		loginItem = (MenuItem) menu.findItem(R.id.mainLogin);
 		return true;
 	}
 	
@@ -172,7 +220,23 @@ public class MainActivity extends Activity {
 			startActivity(intent);
 			finish();
 			return true;
-		}
+		}else if(id == R.id.mainLogin){
+			if (TwitterUtils.isAuthenticated(prefs)) {
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+				final Editor edit = prefs.edit();
+				edit.remove(OAuth.OAUTH_TOKEN);
+				edit.remove(OAuth.OAUTH_TOKEN_SECRET);
+				edit.commit();
+				item.setTitle("Login");
+				return true;
+        	} else {
+				Intent i = new Intent(getApplicationContext(), PrepareRequestTokenActivity.class);
+				startActivity(i);
+			
+				return true;
+        	}
+        }
+		
 		return super.onOptionsItemSelected(item);
 	}
 
