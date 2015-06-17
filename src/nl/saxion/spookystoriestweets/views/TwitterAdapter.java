@@ -26,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import nl.saxion.spookystoriestweets.ProfileActivity;
 import nl.saxion.spookystoriestweets.R;
 import nl.saxion.spookystoriestweets.model.Entity;
 import nl.saxion.spookystoriestweets.model.Hashtag;
@@ -56,6 +57,9 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 
 		TextView user = (TextView) convertView.findViewById(R.id.tvUser);
 		TextView tweetText = (TextView) convertView.findViewById(R.id.tvTweet);
+		ImageView ivSmallAvatar = (ImageView) convertView.findViewById(R.id.ivUserImage);
+		ivSmallAvatar.setImageBitmap(ProfileActivity.getImage(currentUser.getPictureURL()));
+		
 		LinearLayout ll = (LinearLayout) convertView
 				.findViewById(R.id.llDisplayTweet);
 		sbTweet = new SpannableStringBuilder(currentTweet.getTweetText());

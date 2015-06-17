@@ -163,7 +163,7 @@ public class ProfileActivity extends Activity implements Observer {
 		return super.onOptionsItemSelected(item);
 	}
 	
-    public Bitmap getImage(String url) {
+    public static Bitmap getImage(String url) {
         try {
         	
         	
