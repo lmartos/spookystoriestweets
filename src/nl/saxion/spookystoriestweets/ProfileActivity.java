@@ -14,6 +14,7 @@ import oauth.signpost.OAuth;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
+import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.User;
 import twitter4j.auth.AccessToken;
@@ -30,6 +31,10 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -46,11 +51,14 @@ public class ProfileActivity extends Activity implements Observer {
 	private Model model;
 	private TwitterAdapter adapter;
 	private LinearLayout llBanner;
+	private Button buttonPostTweet;
+	private EditText etPostTweet;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile);
+		
 		
 		
 		tvScreenName = (TextView) findViewById(R.id.tvProfileScreenName);
@@ -61,17 +69,19 @@ public class ProfileActivity extends Activity implements Observer {
 		ivProfileAvatar = (ImageView) findViewById(R.id.ivProfileAvatar);
 		lvTimeline = (ListView) findViewById(R.id.lvTimeLine);
 		llBanner = (LinearLayout) findViewById(R.id.llBanner);
+		buttonPostTweet = (Button) findViewById(R.id.buttonPostTweet);
+		etPostTweet = (EditText) findViewById(R.id.etPostTweet);
 		
 		
 		model = ((SpookyStoriesTweetsApplication) getBaseContext().getApplicationContext()).getModel();	
-		
+		model.clearTimeline();
 		
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String token = prefs.getString(OAuth.OAUTH_TOKEN, "");
 		String secret = prefs.getString(OAuth.OAUTH_TOKEN_SECRET, "");
 		
 		AccessToken a = new AccessToken(token,secret);
-		Twitter twitter = new TwitterFactory().getInstance();
+		twitter = new TwitterFactory().getInstance();
 		twitter.setOAuthConsumer(Constants.CONSUMER_KEY, Constants.CONSUMER_SECRET);
 		twitter.setOAuthAccessToken(a);
 		
@@ -79,7 +89,28 @@ public class ProfileActivity extends Activity implements Observer {
 		lvTimeline.setAdapter(adapter);
 		
 		
-		
+		buttonPostTweet.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				String tweet = ""+etPostTweet.getText();
+				if(tweet.equals("")){
+					return;
+				}else{
+					try {
+						twitter.updateStatus(tweet);
+						model.clearTimeline();
+						for(Status s : twitter.getUserTimeline()){
+							model.addToTimeline(new Tweet(s));
+						}
+						adapter.notifyDataSetChanged();
+						etPostTweet.setText("");
+					} catch (TwitterException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
 		
 	
 		try {
@@ -100,13 +131,9 @@ public class ProfileActivity extends Activity implements Observer {
 			Bitmap bitmap = getImage(user.getProfileBannerURL());
 			Drawable drawable = new BitmapDrawable(getResources(), bitmap);
 			llBanner.setBackgroundDrawable(drawable);
-			tvTweetCount.setText("" + user.getStatusesCount() +  " Tweets");
-			tvFollowingCount.setText("" + twitter.getFriendsIDs(-1).getIDs().length + " Following");
-			tvFollowersCount.setText("" + twitter.getFollowersIDs(-1).getIDs().length + " Followers");
-			Log.d("PROFILE", twitter.getScreenName());
-			Log.d("PROFILE", "" + twitter.getUserTimeline().size());
-			Log.d("PROFILE", "" + twitter.getFavorites().size());
-			Log.d("PROFILE", "" + twitter.getFollowersIDs(twitter.getId()).getIDs().length);
+			tvTweetCount.setText("" + user.getStatusesCount() +  "\nTweets");
+			tvFollowingCount.setText("" + user.getFriendsCount() + "\nFollowing");
+			tvFollowersCount.setText("" + user.getFollowersCount() + "\nFollowers");
 		} catch (Exception e) {
 			Log.d("Twitter Exception", e.getMessage());
 			e.printStackTrace();
@@ -158,5 +185,12 @@ public class ProfileActivity extends Activity implements Observer {
 	public void update(Observable observable, Object data) {
 		adapter.notifyDataSetChanged();
 		
+	}
+	
+	@Override
+	public void onBackPressed() {
+		Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+		startActivity(intent);
+		finish();
 	}
 }

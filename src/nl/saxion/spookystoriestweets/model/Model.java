@@ -61,4 +61,7 @@ public class Model extends Observable implements Observer {
 		notifyObservers();
 	}
 
+	public void clearTimeline(){
+		this.timeline.clear();
+	}
 }
