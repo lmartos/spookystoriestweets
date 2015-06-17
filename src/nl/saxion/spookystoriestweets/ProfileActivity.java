@@ -77,17 +77,17 @@ public class ProfileActivity extends Activity implements Observer {
 	
 		try {
 			User user = twitter.showUser(twitter.getId());
-			url = user.getProfileImageURL();
+			url = user.getBiggerProfileImageURL();
 			
 			
-			for(Status s : twitter.getHomeTimeline()){
+			for(Status s : twitter.getUserTimeline()){
 				model.addToTimeline(new Tweet(s));
 			}
 			
 			
 			ivProfileAvatar.setImageBitmap(getImage(url));
 			
-			tvScreenName.setText(twitter.getScreenName());
+			tvScreenName.setText(user.getName());
 			tvTag.setText("@" + twitter.getScreenName() );
 			
 			tvTweetCount.setText("" + user.getStatusesCount() +  " Tweets");
