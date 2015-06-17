@@ -22,12 +22,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -41,6 +45,7 @@ public class ProfileActivity extends Activity implements Observer {
 	private ResponseList<Status> timeline;
 	private Model model;
 	private TwitterAdapter adapter;
+	private LinearLayout llBanner;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,8 @@ public class ProfileActivity extends Activity implements Observer {
 		tvFollowersCount = (TextView) findViewById(R.id.tvFollowersCount);
 		ivProfileAvatar = (ImageView) findViewById(R.id.ivProfileAvatar);
 		lvTimeline = (ListView) findViewById(R.id.lvTimeLine);
+		llBanner = (LinearLayout) findViewById(R.id.llBanner);
+		
 		
 		model = ((SpookyStoriesTweetsApplication) getBaseContext().getApplicationContext()).getModel();	
 		
@@ -86,10 +93,13 @@ public class ProfileActivity extends Activity implements Observer {
 			
 			
 			ivProfileAvatar.setImageBitmap(getImage(url));
+			ivProfileAvatar.setBackgroundColor(Color.WHITE);
 			
 			tvScreenName.setText(user.getName());
 			tvTag.setText("@" + twitter.getScreenName() );
-			
+			Bitmap bitmap = getImage(user.getProfileBannerURL());
+			Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+			llBanner.setBackgroundDrawable(drawable);
 			tvTweetCount.setText("" + user.getStatusesCount() +  " Tweets");
 			tvFollowingCount.setText("" + twitter.getFriendsIDs(-1).getIDs().length + " Following");
 			tvFollowersCount.setText("" + twitter.getFollowersIDs(-1).getIDs().length + " Followers");
