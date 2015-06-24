@@ -21,6 +21,13 @@ public class Model extends Observable implements Observer {
 		notifyObservers();
 	}
 	
+	public void setJsonTimeline(String json) {
+		this.json = json;
+		buildTimeline();
+		setChanged();
+		notifyObservers();
+	}
+	
 	public void buildTweetList() {
 	
 		Tweets.clear();
@@ -35,6 +42,22 @@ public class Model extends Observable implements Observer {
 			e.printStackTrace();
 		}
 	}
+	
+	public void buildTimeline() {
+		
+		timeline.clear();
+		try {
+			JSONObject result = new JSONObject(this.json);
+			JSONArray jsonStatus = result.getJSONArray("statuses");
+			
+			for (int i = 0; i < jsonStatus.length(); i++) {
+				addToTimeline(new Tweet(jsonStatus.getJSONObject(i)));
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	
 	private void addTweet(Tweet tweet) {
 		tweet.addObserver(this);

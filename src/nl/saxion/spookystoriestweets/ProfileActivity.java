@@ -1,16 +1,27 @@
 package nl.saxion.spookystoriestweets;
 
 import java.io.InputStream;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+
+
 import nl.saxion.spookystoriestweets.model.Model;
 import nl.saxion.spookystoriestweets.model.Tweet;
 import nl.saxion.spookystoriestweets.views.TwitterAdapter;
 import oauth.signpost.OAuth;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -26,6 +37,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -53,6 +65,7 @@ public class ProfileActivity extends Activity implements Observer {
 	private LinearLayout llBanner;
 	private Button buttonPostTweet;
 	private EditText etPostTweet;
+	SharedPreferences prefs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +89,7 @@ public class ProfileActivity extends Activity implements Observer {
 		model = ((SpookyStoriesTweetsApplication) getBaseContext().getApplicationContext()).getModel();	
 		model.clearTimeline();
 		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String token = prefs.getString(OAuth.OAUTH_TOKEN, "");
 		String secret = prefs.getString(OAuth.OAUTH_TOKEN_SECRET, "");
 		
@@ -118,9 +131,8 @@ public class ProfileActivity extends Activity implements Observer {
 			url = user.getBiggerProfileImageURL();
 			
 			
-			for(Status s : twitter.getUserTimeline()){
-				model.addToTimeline(new Tweet(s));
-			}
+			GetTweetsFromTimeline task = new GetTweetsFromTimeline();
+			task.execute();
 			
 			
 			ivProfileAvatar.setImageBitmap(getImage(url));
@@ -141,6 +153,48 @@ public class ProfileActivity extends Activity implements Observer {
 		
 		
 	}
+	
+	public class GetTweetsFromTimeline extends AsyncTask<Void, Integer, String> {
+		
+		String token = prefs.getString(OAuth.OAUTH_TOKEN, "");
+		String secret = prefs.getString(OAuth.OAUTH_TOKEN_SECRET, "");
+		
+		AccessToken a = new AccessToken(token,secret);
+		private HttpResponse response;
+		@Override
+		protected String doInBackground(Void... params) {
+			String timelineJSON = "";
+			try {
+				HttpClient client = new DefaultHttpClient();
+				
+				HttpGet httpGet = new HttpGet(
+							"https://api.twitter.com/1.1/statuses/home_timeline.json");
+				
+				
+
+		        // sign the request
+				CommonsHttpOAuthConsumer consumer = new CommonsHttpOAuthConsumer(token, secret);
+				consumer.setTokenWithSecret(token, secret);
+		        consumer.sign(httpGet);
+
+				ResponseHandler<String> handler = new BasicResponseHandler();
+				response = client.execute(httpGet);
+				Log.d("hallo daar", "ik heb geen idee wat mis gaat maar dit niet");
+				timelineJSON = "{ \"statuses\":" + handler.handleResponse(response) + "}";
+			
+			} catch (Exception e){
+				e.printStackTrace();
+			}
+			return timelineJSON;		
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			model.setJsonTimeline(result);
+			super.onPostExecute(result);
+		}
+
+	}	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
