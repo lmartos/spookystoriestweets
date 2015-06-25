@@ -50,7 +50,7 @@ public class Tweet extends Observable implements Observer{
 		}		
 	}
 	
-	public Tweet(Status status){
+/*	public Tweet(Status status){
 		this.user = new User(status.getUser());
 		user.addObserver(this);
 		this.tweetedText = status.getText();
@@ -78,7 +78,7 @@ public class Tweet extends Observable implements Observer{
 		}
 		
 	}
-	
+	*/
 	public String getTweetText() {
 		return this.tweetedText;
 	}

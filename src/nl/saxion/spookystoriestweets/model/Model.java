@@ -11,6 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 public class Model extends Observable implements Observer {
 	
 	private ArrayList<Tweet> Tweets = new ArrayList<Tweet>();
@@ -18,6 +20,7 @@ public class Model extends Observable implements Observer {
 	private String json = "";
 	private OAuthConsumer consumer;
 	private OAuthProvider provider;
+	private User loggedInUser;
 	private boolean loggedIn = false;
 	
 	public void setJson(String json) {
@@ -30,6 +33,21 @@ public class Model extends Observable implements Observer {
 	public void setJsonTimeline(String json) {
 		this.json = json;
 		buildTimeline();
+		setChanged();
+		notifyObservers();
+	}
+	
+	public void createLoggedInUser(String userJSON){
+		
+		try {
+			
+			JSONObject userData = new JSONObject(userJSON);
+			this.loggedInUser = new User(userData);
+			Log.d("successfully created user", loggedInUser.getName());
+		} catch (JSONException e) {
+			Log.d("user creation error", "unable to build user from current json data");
+			e.printStackTrace();
+		}
 		setChanged();
 		notifyObservers();
 	}
@@ -116,5 +134,9 @@ public class Model extends Observable implements Observer {
 
 	public void clearTimeline(){
 		this.timeline.clear();
+	}
+
+	public User getLoggedInUser() {
+		return this.loggedInUser;
 	}
 }

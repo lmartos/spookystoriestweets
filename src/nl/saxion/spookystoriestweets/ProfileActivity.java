@@ -1,16 +1,23 @@
 package nl.saxion.spookystoriestweets;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
@@ -18,18 +25,27 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 
 
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+
+
+
+
 import nl.saxion.spookystoriestweets.model.Model;
 import nl.saxion.spookystoriestweets.model.Tweet;
+import nl.saxion.spookystoriestweets.model.User;
 import nl.saxion.spookystoriestweets.views.TwitterAdapter;
 import oauth.signpost.OAuth;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
-import twitter4j.User;
 import twitter4j.auth.AccessToken;
 import android.app.Activity;
 import android.content.Intent;
@@ -68,6 +84,8 @@ public class ProfileActivity extends Activity implements Observer {
 	private LinearLayout llBanner;
 	private Button buttonPostTweet;
 	private EditText etPostTweet;
+	private OAuthConsumer consumer;
+	
 	SharedPreferences prefs;
 
 	@Override
@@ -90,6 +108,7 @@ public class ProfileActivity extends Activity implements Observer {
 		
 		
 		model = ((SpookyStoriesTweetsApplication) getBaseContext().getApplicationContext()).getModel();	
+		consumer = model.getConsumer();
 		model.clearTimeline();
 		
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -117,14 +136,14 @@ public class ProfileActivity extends Activity implements Observer {
 					return;
 				}else{
 					try {
-						twitter.updateStatus(tweet);
+						postTweetTask postTask = new postTweetTask();
+						postTask.execute(tweet);
 						model.clearTimeline();
-						for(Status s : twitter.getUserTimeline()){
-							model.addToTimeline(new Tweet(s));
-						}
+						GetTweetsFromTimeline task = new GetTweetsFromTimeline();
+						task.execute();
 						adapter.notifyDataSetChanged();
 						etPostTweet.setText("");
-					} catch (TwitterException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
@@ -136,29 +155,33 @@ public class ProfileActivity extends Activity implements Observer {
 			GetTweetsFromTimeline task = new GetTweetsFromTimeline();
 			task.execute();
 			
-			User user = twitter.showUser(twitter.getId());
-			url = user.getBiggerProfileImageURL();
-			
-		
+			GetLoggedInUser userTask = new GetLoggedInUser();
+			userTask.execute();
 			
 			
-			ivProfileAvatar.setImageBitmap(getImage(url));
-			ivProfileAvatar.setBackgroundColor(Color.WHITE);
-			
-			tvScreenName.setText(user.getName());
-			tvTag.setText("@" + twitter.getScreenName() );
-			Bitmap bitmap = getImage(user.getProfileBannerURL());
-			Drawable drawable = new BitmapDrawable(getResources(), bitmap);
-			llBanner.setBackgroundDrawable(drawable);
-			tvTweetCount.setText("" + user.getStatusesCount() +  "\nTweets");
-			tvFollowingCount.setText("" + user.getFriendsCount() + "\nFollowing");
-			tvFollowersCount.setText("" + user.getFollowersCount() + "\nFollowers");
 		} catch (Exception e) {
-			Log.d("Twitter Exception", e.getMessage());
+			//Log.d("Twitter Exception", e.getMessage());
 			e.printStackTrace();
 		} 
 		
 		
+	}
+	
+	public void updateView(){
+		User user = model.getLoggedInUser();
+		
+		
+		ivProfileAvatar.setImageBitmap(getImage(user.getPictureURL()));
+		ivProfileAvatar.setBackgroundColor(Color.WHITE);
+		
+		tvScreenName.setText(user.getName());
+		tvTag.setText("@" + user.getScreenName() );
+		Bitmap bitmap = getImage(user.getProfileBannerURL());
+		Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+		llBanner.setBackgroundDrawable(drawable);
+		tvTweetCount.setText("" + user.getSend_tweets() +  "\nTweets");
+		tvFollowingCount.setText("" + user.getFollowing() + "\nFollowing");
+		tvFollowersCount.setText("" + user.getFollowers() + "\nFollowers");
 	}
 	
 	public class GetTweetsFromTimeline extends AsyncTask<Void, Integer, String> {
@@ -182,7 +205,7 @@ public class ProfileActivity extends Activity implements Observer {
 				
 
 		        // sign the request
-				OAuthConsumer consumer = model.getConsumer();
+				
 		
 		        consumer.sign(httpGet);
 
@@ -190,22 +213,119 @@ public class ProfileActivity extends Activity implements Observer {
 				response = client.execute(httpGet);
 				Log.d("hallo daar", "ik heb geen idee wat mis gaat maar dit niet");
 				timelineJSON = "{ \"statuses\":" + handler.handleResponse(response) + "}";
-				System.out.println(timelineJSON);
+				//System.out.println(timelineJSON);
+				
 			
 			} catch (Exception e){
 				e.printStackTrace();
 			}
-			return timelineJSON;		
+			return timelineJSON;
+			
+			
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
+			if(!result.equals(null)){
 			model.setJsonTimeline(result);
 			adapter.notifyDataSetChanged();
-			super.onPostExecute(result);
-		}
+			super.onPostExecute(result); 
+			}}
 
 	}	
+	
+	public class GetLoggedInUser extends AsyncTask<Void, Integer, String> {
+		
+		String token = prefs.getString(OAuth.OAUTH_TOKEN, "");
+		String secret = prefs.getString(OAuth.OAUTH_TOKEN_SECRET, "");
+		
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		
+		AccessToken a = new AccessToken(token,secret);
+		private HttpResponse response;
+		@Override
+		protected String doInBackground(Void... params) {
+			String userJSON = "";
+			try {
+				HttpClient client = new DefaultHttpClient();
+				
+				HttpGet httpGet = new HttpGet(
+							"https://api.twitter.com/1.1/account/verify_credentials.json");
+				
+				
+
+		        // sign the request
+				
+		
+		        consumer.sign(httpGet);
+
+				ResponseHandler<String> handler = new BasicResponseHandler();
+				response = client.execute(httpGet);
+				Log.d("hallo daar", "ik heb geen idee wat mis gaat maar dit niet");
+				
+				
+				System.out.println(userJSON);
+				model.createLoggedInUser(handler.handleResponse(response));
+			} catch (Exception e){
+				e.printStackTrace();
+			}
+			return userJSON;		
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+				updateView();
+			}
+
+	
+
+	}	
+	
+	private class postTweetTask extends AsyncTask<String, Void, String>{
+		private HttpResponse response;
+		private String returnJSON;
+		@Override
+		protected String doInBackground(String... params) {
+			HttpClient client = new DefaultHttpClient();
+			
+			HttpPost post = new HttpPost("https://api.twitter.com/1.1/statuses/update.json");
+			
+			List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+			parameters.add(new BasicNameValuePair("status", params[0]));
+			try {
+				post.setEntity(new UrlEncodedFormEntity(parameters, HTTP.UTF_8));
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			try {
+				consumer.sign(post);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			ResponseHandler<String> handler = new BasicResponseHandler();
+			try {
+				response = client.execute(post);
+				returnJSON = handler.handleResponse(response);
+			} catch (ClientProtocolException e) {
+				int statusCode = response.getStatusLine().getStatusCode();
+				return "" + statusCode;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			
+			
+			return null;
+		}
+	}
+	
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -245,6 +365,10 @@ public class ProfileActivity extends Activity implements Observer {
         }
         return null;
     }
+    
+    
+    
+    
 
 	@Override
 	public void update(Observable observable, Object data) {
