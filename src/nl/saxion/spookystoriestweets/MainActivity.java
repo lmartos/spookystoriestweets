@@ -80,7 +80,10 @@ public class MainActivity extends Activity {
 		
 	
 		OauthToken();
-	
+		
+		
+		
+		
 		TwitterAdapter adapter = new TwitterAdapter(this, model.getTweets());
 		model.addObserver(adapter);
 		lvTweets.setAdapter(adapter);
@@ -101,7 +104,7 @@ public class MainActivity extends Activity {
 	
 	public void updateLogin(){
 		
-		if (TwitterUtils.isAuthenticated(prefs)) {
+		if (model.isLoggedIn()) {
 			loginItem.setTitle("Logout");
 		}else{
 			loginItem.setTitle("Login");
@@ -117,6 +120,8 @@ public class MainActivity extends Activity {
 		GenerateTokenTask task = new GenerateTokenTask();
 		task.execute(base64);
 	}
+	
+
 	
 	public class GenerateTokenTask extends AsyncTask<String, Void, String> {
 		private HttpResponse response;
@@ -196,6 +201,7 @@ public class MainActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		this.menu = menu;
+	
 		
 		return true;
 	}
@@ -207,6 +213,7 @@ public class MainActivity extends Activity {
 		return true;
 		
 	}
+
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -220,10 +227,9 @@ public class MainActivity extends Activity {
 		else if (id == R.id.mainProfile) {
 			Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
 			startActivity(intent);
-			finish();
 			return true;
 		}else if(id == R.id.mainLogin){
-			if (TwitterUtils.isAuthenticated(prefs)) {
+			if (model.isLoggedIn()) {
 				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 				final Editor edit = prefs.edit();
 				edit.remove(OAuth.OAUTH_TOKEN);

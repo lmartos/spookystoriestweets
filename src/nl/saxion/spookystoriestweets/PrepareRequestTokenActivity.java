@@ -3,6 +3,7 @@ package nl.saxion.spookystoriestweets;
 
 
 
+import nl.saxion.spookystoriestweets.model.Model;
 import oauth.signpost.OAuth;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
@@ -36,6 +37,7 @@ public class PrepareRequestTokenActivity extends Activity {
 	
     private OAuthConsumer consumer; 
     private OAuthProvider provider;
+    private Model model;
     
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -104,6 +106,10 @@ public class PrepareRequestTokenActivity extends Activity {
 				String secret = prefs.getString(OAuth.OAUTH_TOKEN_SECRET, "");
 				
 				consumer.setTokenWithSecret(token, secret);
+				
+				model = ((SpookyStoriesTweetsApplication) getBaseContext().getApplicationContext()).getModel();	
+				model.setConsumer(consumer);
+				model.setProvider(provider);
 				finish();
 				
 				Log.i(TAG, "OAuth - Access Token Retrieved");

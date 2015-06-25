@@ -1,7 +1,6 @@
 package nl.saxion.spookystoriestweets;
 
 import java.io.InputStream;
-
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -17,10 +16,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 
 
+
+
 import nl.saxion.spookystoriestweets.model.Model;
 import nl.saxion.spookystoriestweets.model.Tweet;
 import nl.saxion.spookystoriestweets.views.TwitterAdapter;
 import oauth.signpost.OAuth;
+import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import twitter4j.ResponseList;
 import twitter4j.Status;
@@ -39,6 +41,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -93,6 +96,9 @@ public class ProfileActivity extends Activity implements Observer {
 		String token = prefs.getString(OAuth.OAUTH_TOKEN, "");
 		String secret = prefs.getString(OAuth.OAUTH_TOKEN_SECRET, "");
 		
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+		
 		AccessToken a = new AccessToken(token,secret);
 		twitter = new TwitterFactory().getInstance();
 		twitter.setOAuthConsumer(Constants.CONSUMER_KEY, Constants.CONSUMER_SECRET);
@@ -127,12 +133,13 @@ public class ProfileActivity extends Activity implements Observer {
 		
 	
 		try {
+			GetTweetsFromTimeline task = new GetTweetsFromTimeline();
+			task.execute();
+			
 			User user = twitter.showUser(twitter.getId());
 			url = user.getBiggerProfileImageURL();
 			
-			
-			GetTweetsFromTimeline task = new GetTweetsFromTimeline();
-			task.execute();
+		
 			
 			
 			ivProfileAvatar.setImageBitmap(getImage(url));
@@ -159,6 +166,8 @@ public class ProfileActivity extends Activity implements Observer {
 		String token = prefs.getString(OAuth.OAUTH_TOKEN, "");
 		String secret = prefs.getString(OAuth.OAUTH_TOKEN_SECRET, "");
 		
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		
 		AccessToken a = new AccessToken(token,secret);
 		private HttpResponse response;
 		@Override
@@ -173,14 +182,15 @@ public class ProfileActivity extends Activity implements Observer {
 				
 
 		        // sign the request
-				CommonsHttpOAuthConsumer consumer = new CommonsHttpOAuthConsumer(token, secret);
-				consumer.setTokenWithSecret(token, secret);
+				OAuthConsumer consumer = model.getConsumer();
+		
 		        consumer.sign(httpGet);
 
 				ResponseHandler<String> handler = new BasicResponseHandler();
 				response = client.execute(httpGet);
 				Log.d("hallo daar", "ik heb geen idee wat mis gaat maar dit niet");
 				timelineJSON = "{ \"statuses\":" + handler.handleResponse(response) + "}";
+				System.out.println(timelineJSON);
 			
 			} catch (Exception e){
 				e.printStackTrace();
@@ -191,6 +201,7 @@ public class ProfileActivity extends Activity implements Observer {
 		@Override
 		protected void onPostExecute(String result) {
 			model.setJsonTimeline(result);
+			adapter.notifyDataSetChanged();
 			super.onPostExecute(result);
 		}
 

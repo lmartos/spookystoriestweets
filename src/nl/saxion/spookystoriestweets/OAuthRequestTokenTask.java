@@ -1,5 +1,6 @@
 package nl.saxion.spookystoriestweets;
 
+import nl.saxion.spookystoriestweets.model.Model;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
 import android.content.Context;
@@ -24,6 +25,7 @@ public class OAuthRequestTokenTask extends AsyncTask<Void, Void, Void> {
 	private Context	context;
 	private OAuthProvider provider;
 	private OAuthConsumer consumer;
+	private Model model;
 
 	/**
 	 * 
@@ -37,6 +39,8 @@ public class OAuthRequestTokenTask extends AsyncTask<Void, Void, Void> {
 	 * 			The OAuthConsumer object
 	 */
 	public OAuthRequestTokenTask(Context context,OAuthConsumer consumer,OAuthProvider provider) {
+		
+		
 		this.context = context;
 		this.consumer = consumer;
 		this.provider = provider;
