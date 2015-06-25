@@ -19,12 +19,14 @@ public class Tweet extends Observable implements Observer{
 	private User user;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private JSONArray hashtags, urls, media;
+	private int tweetId;
 	
 	public Tweet (JSONObject tweetObj) throws JSONException {
 		user = new User(tweetObj.getJSONObject("user"));
 		user.addObserver(this);
 		tweetedText = tweetObj.getString("text");
 		tweetDate = tweetObj.getString("created_at");
+		tweetId = tweetObj.getInt("id");
 		
 		
 		JSONObject entityObj = tweetObj.getJSONObject("entities");
@@ -97,5 +99,7 @@ public class Tweet extends Observable implements Observer{
 		return this.user;
 	}
 
-
+	public int getId(){
+		return this.tweetId;
+	}
 }

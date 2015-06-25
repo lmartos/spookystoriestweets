@@ -225,9 +225,11 @@ public class MainActivity extends Activity {
 		}
 
 		else if (id == R.id.mainProfile) {
-			Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-			startActivity(intent);
-			return true;
+			if(model.isLoggedIn()){
+				Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+				startActivity(intent);
+				return true;
+			}
 		}else if(id == R.id.mainLogin){
 			if (model.isLoggedIn()) {
 				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);

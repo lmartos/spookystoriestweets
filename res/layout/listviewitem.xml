@@ -41,22 +41,16 @@
         android:layout_height="wrap_content" >
 
         <Button
-            android:id="@+id/buttonComment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Comment" />
-
-        <Button
             android:id="@+id/buttonRetweet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Retweet" />
 
         <Button
-            android:id="@+id/buttonFavorite"
+            android:id="@+id/buttonFollow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Favorite" />
+            android:text="Follow" />
 
     </LinearLayout>
 
