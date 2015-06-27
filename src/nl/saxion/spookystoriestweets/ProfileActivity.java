@@ -31,6 +31,7 @@ import org.apache.http.protocol.HTTP;
 
 
 
+
 import nl.saxion.spookystoriestweets.model.Model;
 import nl.saxion.spookystoriestweets.model.Tweet;
 import nl.saxion.spookystoriestweets.model.User;
@@ -107,6 +108,8 @@ public class ProfileActivity extends Activity implements Observer {
 		etPostTweet = (EditText) findViewById(R.id.etPostTweet);
 		
 		
+		
+		
 		model = ((SpookyStoriesTweetsApplication) getBaseContext().getApplicationContext()).getModel();	
 		consumer = model.getConsumer();
 		model.clearTimeline();
@@ -125,6 +128,18 @@ public class ProfileActivity extends Activity implements Observer {
 		
 		adapter = new TwitterAdapter(this, model.getTimeline());
 		lvTimeline.setAdapter(adapter);
+		
+		tvFollowersCount.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ProfileActivity.this, FollowerActivity.class);
+				startActivity(intent);
+				
+			}
+			
+		});
+		
 		
 		
 		buttonPostTweet.setOnClickListener(new OnClickListener() {
@@ -165,6 +180,11 @@ public class ProfileActivity extends Activity implements Observer {
 		} 
 		
 		
+	}
+	
+	@Override
+	public void onBackPressed(){
+		finish();
 	}
 	
 	public void updateView(){
@@ -211,7 +231,7 @@ public class ProfileActivity extends Activity implements Observer {
 
 				ResponseHandler<String> handler = new BasicResponseHandler();
 				response = client.execute(httpGet);
-				Log.d("hallo daar", "ik heb geen idee wat mis gaat maar dit niet");
+			
 				timelineJSON = "{ \"statuses\":" + handler.handleResponse(response) + "}";
 				//System.out.println(timelineJSON);
 				
@@ -261,7 +281,7 @@ public class ProfileActivity extends Activity implements Observer {
 
 				ResponseHandler<String> handler = new BasicResponseHandler();
 				response = client.execute(httpGet);
-				Log.d("hallo daar", "ik heb geen idee wat mis gaat maar dit niet");
+			
 				
 				
 				System.out.println(userJSON);
@@ -376,10 +396,5 @@ public class ProfileActivity extends Activity implements Observer {
 		
 	}
 	
-	@Override
-	public void onBackPressed() {
-		Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
-		startActivity(intent);
-		finish();
-	}
+
 }

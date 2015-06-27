@@ -11,17 +11,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.util.Log;
 
 public class Model extends Observable implements Observer {
 	
 	private ArrayList<Tweet> Tweets = new ArrayList<Tweet>();
 	private ArrayList<Tweet> timeline = new ArrayList<Tweet>();
+	private ArrayList<Tweet> followerTimeline = new ArrayList<Tweet>();
+	private ArrayList<User> followers = new ArrayList<User>();
 	private String json = "";
 	private OAuthConsumer consumer;
 	private OAuthProvider provider;
 	private User loggedInUser;
 	private boolean loggedIn = false;
+	
 	
 	public void setJson(String json) {
 		this.json = json;
@@ -59,6 +63,12 @@ public class Model extends Observable implements Observer {
 	
 	public boolean isLoggedIn(){
 		return loggedIn;
+	}
+	
+
+	
+	public ArrayList<User> getFollowerList(){
+		return followers;
 	}
 	
 	public void setLoggedIn(boolean loggedIn){
@@ -99,11 +109,34 @@ public class Model extends Observable implements Observer {
 			JSONArray jsonStatus = result.getJSONArray("statuses");
 			
 			for (int i = 0; i < jsonStatus.length(); i++) {
-				addToTimeline(new Tweet(jsonStatus.getJSONObject(i)));
+				timeline.add(new Tweet(jsonStatus.getJSONObject(i)));
+				setChanged();
+				notifyObservers();
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void buildFollowerTimeline(String json) {
+		
+		followerTimeline.clear();
+		try {
+			JSONObject result = new JSONObject(json);
+			JSONArray jsonStatus = result.getJSONArray("statuses");
+			
+			for (int i = 0; i < jsonStatus.length(); i++) {
+				followerTimeline.add(new Tweet(jsonStatus.getJSONObject(i)));
+				setChanged();
+				notifyObservers();
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public ArrayList<Tweet> getFollowerTimeline(){
+		return this.followerTimeline;
 	}
 	
 	
@@ -112,11 +145,7 @@ public class Model extends Observable implements Observer {
 		Tweets.add(tweet);
 	}
 	
-	public void addToTimeline(Tweet tweet){
-		this.timeline.add(tweet);
-		setChanged();
-		notifyObservers();
-	}
+
 	
 	public ArrayList<Tweet> getTimeline(){
 		return this.timeline;
@@ -139,4 +168,22 @@ public class Model extends Observable implements Observer {
 	public User getLoggedInUser() {
 		return this.loggedInUser;
 	}
+
+	public void handleFollowers(String result) {
+		try {
+			JSONObject followersJSON = new JSONObject(result);
+			JSONArray followersJSONArray = followersJSON.getJSONArray("users");
+			for (int i = 0; i < followersJSONArray.length(); i++) {
+				followers.add(new User(followersJSONArray.getJSONObject(i)));
+			}
+			setChanged();
+			notifyObservers();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+
 }
