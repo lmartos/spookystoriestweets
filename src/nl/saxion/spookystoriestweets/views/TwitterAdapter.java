@@ -45,9 +45,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import nl.saxion.spookystoriestweets.ProfileActivity;
 import nl.saxion.spookystoriestweets.R;
+import nl.saxion.spookystoriestweets.SpookyStoriesTweetsApplication;
 import nl.saxion.spookystoriestweets.model.Entity;
 import nl.saxion.spookystoriestweets.model.Hashtag;
 import nl.saxion.spookystoriestweets.model.Media;
+import nl.saxion.spookystoriestweets.model.Model;
 import nl.saxion.spookystoriestweets.model.Tweet;
 import nl.saxion.spookystoriestweets.model.Url;
 import nl.saxion.spookystoriestweets.model.User;
@@ -58,6 +60,8 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 	private Context context;
 	private Button buttonRetweet, buttonFollow;
 	private OAuthConsumer consumer;
+	private SpookyStoriesTweetsApplication app;
+	private Model model;
 
 	/**
 	 * Constructor for the TwitterAdapter
@@ -67,6 +71,8 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 	 */
 	public TwitterAdapter(Context context, ArrayList<Tweet> listOfTweets) {
 		super(context, R.layout.listviewitem, listOfTweets);
+		app = (SpookyStoriesTweetsApplication) context.getApplicationContext();
+		model = app.getModel();
 	}
 
 	@Override
@@ -78,7 +84,6 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 			convertView = LayoutInflater.from(getContext()).inflate(
 					R.layout.listviewitem, parent, false);
 		}
-
 		buttonRetweet = (Button) convertView.findViewById(R.id.buttonRetweet);
 		buttonFollow = (Button) convertView.findViewById(R.id.buttonFollow);
 		TextView user = (TextView) convertView.findViewById(R.id.tvUser);
@@ -96,6 +101,7 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 
 			@Override
 			public void onClick(View v) {
+				consumer = model.getConsumer();
 				String screenName = "" + cUser.getUserId();
 				FollowTask followTask = new FollowTask();
 				followTask.execute(screenName);
@@ -111,6 +117,7 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 
 			@Override
 			public void onClick(View v) {
+				consumer = model.getConsumer();
 				String tweetId = "" + cTweet.getId();
 				RetweetTask retweetTask = new RetweetTask();
 				retweetTask.execute(tweetId);
@@ -223,6 +230,7 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 	 */
 	private class FollowTask extends AsyncTask<String, Void, String> {
 		private HttpResponse response;
+		
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 		.permitAll().build();
 		/**
