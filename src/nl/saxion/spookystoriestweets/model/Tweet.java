@@ -1,37 +1,39 @@
 package nl.saxion.spookystoriestweets.model;
 
-import java.util.*;
+/**	
+ * 
+ * @author Doron Hartog & Laurens Martos
 
+ *
+ */
+import java.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
-
-import twitter4j.HashtagEntity;
-import twitter4j.MediaEntity;
-import twitter4j.Status;
-import twitter4j.URLEntity;
-
 import java.util.Observable;
 
-public class Tweet extends Observable implements Observer{
+public class Tweet extends Observable implements Observer {
 
 	private String tweetedText, tweetDate;
 	private User user;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private JSONArray hashtags, urls, media;
 	private int tweetId;
-	
-	public Tweet (JSONObject tweetObj) throws JSONException {
+	/**
+	 * 					The constructor of a Tweet
+	 * 					Builds the Tweet from a JSONObject
+	 * @param tweetObj
+	 * @throws JSONException
+	 */
+	public Tweet(JSONObject tweetObj) throws JSONException {
 		user = new User(tweetObj.getJSONObject("user"));
 		user.addObserver(this);
 		tweetedText = tweetObj.getString("text");
 		tweetDate = tweetObj.getString("created_at");
 		tweetId = tweetObj.getInt("id");
-		
-		
+
 		JSONObject entityObj = tweetObj.getJSONObject("entities");
-		
-	
+
 		if (entityObj.has("hashtags")) {
 			hashtags = entityObj.getJSONArray("hashtags");
 			for (int i = 0; i < hashtags.length(); i++) {
@@ -49,57 +51,44 @@ public class Tweet extends Observable implements Observer{
 			for (int i = 0; i < media.length(); i++) {
 				entities.add(new Media(media.getJSONObject(i)));
 			}
-		}		
+		}
 	}
-	
-/*	public Tweet(Status status){
-		this.user = new User(status.getUser());
-		user.addObserver(this);
-		this.tweetedText = status.getText();
-		this.tweetDate = status.getCreatedAt().toString();
-		
-		
-		
-		if(status.getHashtagEntities().length > 0){
-			for(HashtagEntity h : status.getHashtagEntities()){
-				entities.add(new Hashtag(h));
-			}
-
-		}
-		
-		if(status.getURLEntities().length > 0){
-			for(URLEntity u: status.getURLEntities()){
-				entities.add(new Url(u));
-			}
-		}
-		
-		if(status.getMediaEntities().length > 0){
-			for(MediaEntity m : status.getMediaEntities()){
-				
-			}
-		}
-		
-	}
-	*/
+	/**
+	 * 			the getter of the complete tweet
+	 * @return	returns the tweet in String
+	 */
 	public String getTweetText() {
 		return this.tweetedText;
 	}
 
+	/**
+	 * 	updates the data
+	 */
 	@Override
 	public void update(Observable observable, Object data) {
 		setChanged();
 		notifyObservers();
 	}
-	
+	/**
+	 * 			the getter of the Entities
+	 * @return	returns an ArrayList<Entity>
+	 */
 	public ArrayList<Entity> getEntities() {
 		return entities;
 	}
-	
+	/**
+	 * 			the getter of a user
+	 * @return	returns the user in User
+	 */
 	public User getUser() {
 		return this.user;
 	}
 
-	public int getId(){
+	/**
+	 * 			the getter of a twitter id
+	 * @return	returns the tweetId in Integer
+	 */
+	public int getId() {
 		return this.tweetId;
 	}
 }

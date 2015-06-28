@@ -1,15 +1,11 @@
 package nl.saxion.spookystoriestweets;
 
+/**	
+ * 
+ * @author Doron Hartog & Laurens Martos
+ *
+ */
 import java.net.URLEncoder;
-
-
-
-
-
-
-
-
-
 
 
 import oauth.signpost.OAuth;
@@ -24,13 +20,7 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
-
-
-
-
-
 import android.app.Activity;
-import android.content.ClipData.Item;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -55,7 +45,7 @@ public class MainActivity extends Activity {
 	private static final String APIKEY = "D7eeHiP0mPYd1RCHdu3aDsoFT";
 	private static final String APISECRET = "DL9Wju1bRMdllWsbKAOSH4WlgZ1AA04hw48JjdSlrk0JRpSKb9";
 	private static String bearerToken = "";
-	
+
 	private Model model;
 	private Menu menu;
 	private EditText etSearchTerm;
@@ -63,31 +53,29 @@ public class MainActivity extends Activity {
 	private SharedPreferences prefs;
 	private MenuItem loginItem;
 	Button btnSearch;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-		
-		model = ((SpookyStoriesTweetsApplication) getBaseContext().getApplicationContext()).getModel();		
-	
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+				.permitAll().build();
+		StrictMode.setThreadPolicy(policy);
+
+		model = ((SpookyStoriesTweetsApplication) getBaseContext()
+				.getApplicationContext()).getModel();
+
 		lvTweets = (ListView) findViewById(R.id.lvTweets);
 		btnSearch = (Button) findViewById(R.id.btnSearch);
 		etSearchTerm = (EditText) findViewById(R.id.etSearchTerm);
-		
-	
+
 		OauthToken();
-		
-		
-		
-		
+
 		TwitterAdapter adapter = new TwitterAdapter(this, model.getTweets());
 		model.addObserver(adapter);
 		lvTweets.setAdapter(adapter);
-		
+
 		btnSearch.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -99,18 +87,15 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
-	
-	
-	
-	public void updateLogin(){
-		
+
+	public void updateLogin() {
+
 		if (model.isLoggedIn()) {
 			loginItem.setTitle("Logout");
-		}else{
+		} else {
 			loginItem.setTitle("Login");
 		}
 	}
-	
 
 	private void OauthToken() {
 		String authString = APIKEY + ":" + APISECRET;
@@ -120,9 +105,7 @@ public class MainActivity extends Activity {
 		GenerateTokenTask task = new GenerateTokenTask();
 		task.execute(base64);
 	}
-	
 
-	
 	public class GenerateTokenTask extends AsyncTask<String, Void, String> {
 		private HttpResponse response;
 
@@ -143,7 +126,7 @@ public class MainActivity extends Activity {
 
 				String responseString = new BasicResponseHandler()
 						.handleResponse(response);
-				
+
 				JSONObject jsonO = new JSONObject(responseString);
 				token = jsonO.getString("access_token");
 			} catch (Exception e) {
@@ -155,15 +138,15 @@ public class MainActivity extends Activity {
 		@Override
 		protected void onPostExecute(String result) {
 			bearerToken = result;
-		
 
 			super.onPostExecute(result);
 		}
 
 	}
-	
+
 	public class RetrieveTweets extends AsyncTask<String, Void, String> {
 		private HttpResponse response;
+
 		@Override
 		protected String doInBackground(String... params) {
 			Log.d("json", "doInBackground GetTweetsFromInputTask");
@@ -173,20 +156,18 @@ public class MainActivity extends Activity {
 				HttpGet httpGet = new HttpGet(
 						"https://api.twitter.com/1.1/search/tweets.json?q="
 								+ params[0]);
-				httpGet.setHeader("Authorization", "Bearer " + bearerToken);				
+				httpGet.setHeader("Authorization", "Bearer " + bearerToken);
 				try {
 					ResponseHandler<String> handler = new BasicResponseHandler();
 					response = client.execute(httpGet);
 					searchJSON = handler.handleResponse(response);
 					Log.d("json", searchJSON);
-				} catch (Exception e){
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			} 
-			return searchJSON;		
+			}
+			return searchJSON;
 		}
-		
-		
 
 		@Override
 		protected void onPostExecute(String result) {
@@ -196,28 +177,27 @@ public class MainActivity extends Activity {
 		}
 
 	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		this.menu = menu;
-	
-		
+
 		return true;
 	}
+
 	@Override
-	public boolean onPrepareOptionsMenu(Menu menu){
+	public boolean onPrepareOptionsMenu(Menu menu) {
 		super.onPrepareOptionsMenu(menu);
 		loginItem = (MenuItem) menu.findItem(R.id.mainLogin);
 		updateLogin();
 		return true;
-		
+
 	}
 
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		
+
 		int id = item.getItemId();
 
 		if (id == R.id.mainTimeline) {
@@ -225,28 +205,31 @@ public class MainActivity extends Activity {
 		}
 
 		else if (id == R.id.mainProfile) {
-			if(model.isLoggedIn()){
-				Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+			if (model.isLoggedIn()) {
+				Intent intent = new Intent(MainActivity.this,
+						ProfileActivity.class);
 				startActivity(intent);
 				return true;
 			}
-		}else if(id == R.id.mainLogin){
+		} else if (id == R.id.mainLogin) {
 			if (model.isLoggedIn()) {
-				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+				SharedPreferences prefs = PreferenceManager
+						.getDefaultSharedPreferences(this);
 				final Editor edit = prefs.edit();
 				edit.remove(OAuth.OAUTH_TOKEN);
 				edit.remove(OAuth.OAUTH_TOKEN_SECRET);
 				edit.commit();
 				item.setTitle("Login");
 				return true;
-        	} else {
-				Intent i = new Intent(getApplicationContext(), PrepareRequestTokenActivity.class);
+			} else {
+				Intent i = new Intent(getApplicationContext(),
+						PrepareRequestTokenActivity.class);
 				startActivity(i);
-			
+
 				return true;
-        	}
-        }
-		
+			}
+		}
+
 		return super.onOptionsItemSelected(item);
 	}
 

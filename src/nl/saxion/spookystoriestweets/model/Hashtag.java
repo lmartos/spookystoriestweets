@@ -1,27 +1,31 @@
 package nl.saxion.spookystoriestweets.model;
 
-import org.json.JSONArray;
+/**	
+ * 
+ * @author Doron Hartog & Laurens Martos
+ *
+ */
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import twitter4j.HashtagEntity;
 
 public class Hashtag extends Entity {
 
 	private String text;
 
+	/**
+	 * 			gets the text of a Hashtag
+	 * @return	return the hashtag in String
+	 */
 	public String getText() {
 		return text;
 	}
-	
+	/**
+	 * 						retrieves the text of a hashtag from a JSONObject
+	 * @param entityObj
+	 * @throws JSONException
+	 */
 	public Hashtag(JSONObject entityObj) throws JSONException {
 		super(entityObj.getJSONArray("indices"));
 		text = entityObj.getString("text");
 	}
-	
-	public Hashtag(HashtagEntity entity){
-		super(entity.getStart(), entity.getEnd());
-		text = entity.getText();
-	}
-
 }

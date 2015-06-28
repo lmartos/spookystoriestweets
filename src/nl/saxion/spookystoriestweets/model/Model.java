@@ -1,6 +1,12 @@
 package nl.saxion.spookystoriestweets.model;
 
+/**	
+ * 
+ * @author Doron Hartog & Laurens Martos
+ *
+ */
 import java.util.ArrayList;
+
 import java.util.Observable;
 import java.util.Observer;
 
@@ -11,11 +17,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
-import android.util.Log;
-
 public class Model extends Observable implements Observer {
-	
+
 	private ArrayList<Tweet> Tweets = new ArrayList<Tweet>();
 	private ArrayList<Tweet> timeline = new ArrayList<Tweet>();
 	private ArrayList<Tweet> followerTimeline = new ArrayList<Tweet>();
@@ -25,74 +28,70 @@ public class Model extends Observable implements Observer {
 	private OAuthProvider provider;
 	private User loggedInUser;
 	private boolean loggedIn = false;
-	
-	
+
 	public void setJson(String json) {
 		this.json = json;
 		buildTweetList();
 		setChanged();
 		notifyObservers();
 	}
-	
+
 	public void setJsonTimeline(String json) {
 		this.json = json;
 		buildTimeline();
 		setChanged();
 		notifyObservers();
 	}
-	
-	public void createLoggedInUser(String userJSON){
-		
+
+	public void createLoggedInUser(String userJSON) {
+
 		try {
-			
+
 			JSONObject userData = new JSONObject(userJSON);
 			this.loggedInUser = new User(userData);
-			Log.d("successfully created user", loggedInUser.getName());
 		} catch (JSONException e) {
-			Log.d("user creation error", "unable to build user from current json data");
 			e.printStackTrace();
 		}
 		setChanged();
 		notifyObservers();
 	}
-	
-	public void setConsumer(OAuthConsumer consumer){
+
+	public void setConsumer(OAuthConsumer consumer) {
 		this.consumer = consumer;
 		this.loggedIn = true;
 	}
-	
-	public boolean isLoggedIn(){
+
+	public boolean isLoggedIn() {
 		return loggedIn;
 	}
-	
 
-	
-	public ArrayList<User> getFollowerList(){
+	public ArrayList<User> getFollowerList() {
 		return followers;
 	}
-	
-	public void setLoggedIn(boolean loggedIn){
+
+	public void setLoggedIn(boolean loggedIn) {
 		this.loggedIn = loggedIn;
 	}
-	public void setProvider(OAuthProvider provider){
+
+	public void setProvider(OAuthProvider provider) {
 		this.provider = provider;
 	}
-	
-	public OAuthConsumer getConsumer(){
+
+	public OAuthConsumer getConsumer() {
 		return this.consumer;
 	}
-	
-	public OAuthProvider getProvider(){
+
+	public OAuthProvider getProvider() {
 		return this.provider;
 	}
-	
+
 	public void buildTweetList() {
-	
+
 		Tweets.clear();
 		try {
 			JSONObject result = new JSONObject(this.json);
 			JSONArray jsonStatus = result.getJSONArray("statuses");
-			
+
 			for (int i = 0; i < jsonStatus.length(); i++) {
 				addTweet(new Tweet(jsonStatus.getJSONObject(i)));
 			}
@@ -100,14 +99,14 @@ public class Model extends Observable implements Observer {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void buildTimeline() {
-		
+
 		timeline.clear();
 		try {
 			JSONObject result = new JSONObject(this.json);
 			JSONArray jsonStatus = result.getJSONArray("statuses");
-			
+
 			for (int i = 0; i < jsonStatus.length(); i++) {
 				timeline.add(new Tweet(jsonStatus.getJSONObject(i)));
 				setChanged();
@@ -117,14 +116,14 @@ public class Model extends Observable implements Observer {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void buildFollowerTimeline(String json) {
-		
+
 		followerTimeline.clear();
 		try {
 			JSONObject result = new JSONObject(json);
 			JSONArray jsonStatus = result.getJSONArray("statuses");
-			
+
 			for (int i = 0; i < jsonStatus.length(); i++) {
 				followerTimeline.add(new Tweet(jsonStatus.getJSONObject(i)));
 				setChanged();
@@ -134,34 +133,31 @@ public class Model extends Observable implements Observer {
 			e.printStackTrace();
 		}
 	}
-	
-	public ArrayList<Tweet> getFollowerTimeline(){
+
+	public ArrayList<Tweet> getFollowerTimeline() {
 		return this.followerTimeline;
 	}
-	
-	
+
 	private void addTweet(Tweet tweet) {
 		tweet.addObserver(this);
 		Tweets.add(tweet);
 	}
-	
 
-	
-	public ArrayList<Tweet> getTimeline(){
+	public ArrayList<Tweet> getTimeline() {
 		return this.timeline;
 	}
-	
+
 	public ArrayList<Tweet> getTweets() {
 		return this.Tweets;
 	}
-	
+
 	@Override
 	public void update(Observable observable, Object data) {
 		setChanged();
 		notifyObservers();
 	}
 
-	public void clearTimeline(){
+	public void clearTimeline() {
 		this.timeline.clear();
 	}
 
@@ -179,11 +175,9 @@ public class Model extends Observable implements Observer {
 			setChanged();
 			notifyObservers();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-	}
 
+	}
 
 }

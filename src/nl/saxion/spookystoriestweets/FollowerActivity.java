@@ -1,5 +1,10 @@
 package nl.saxion.spookystoriestweets;
 
+/**	
+ * 
+ * @author Doron Hartog & Laurens Martos
+ *
+ */
 
 import java.util.Observable;
 import java.util.Observer;
@@ -29,7 +34,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 public class FollowerActivity extends Activity implements Observer {
-	
+
 	private Model model;
 	private OAuthConsumer consumer;
 	private ListView lvFollowers;
@@ -39,116 +44,106 @@ public class FollowerActivity extends Activity implements Observer {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_follower);
-		
-		model = ((SpookyStoriesTweetsApplication) getBaseContext().getApplicationContext()).getModel();
+
+		model = ((SpookyStoriesTweetsApplication) getBaseContext()
+				.getApplicationContext()).getModel();
 		model.addObserver(this);
 		consumer = model.getConsumer();
-		
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-        
-        
-        lvFollowers = (ListView) findViewById(R.id.lvFollowers);
-		
-        adapter = new FollowerAdapter(this, model.getFollowerList());
-        
-        lvFollowers.setAdapter(adapter);
-        lvFollowers.setOnItemClickListener(new FollowerClickListener());
-		
-		GetFollowersTask  task = new GetFollowersTask();
-		task.execute();
-	
-	
-	}
-	
-	public class FollowerClickListener implements OnItemClickListener {
 
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+				.permitAll().build();
+		StrictMode.setThreadPolicy(policy);
+
+		lvFollowers = (ListView) findViewById(R.id.lvFollowers);
+
+		adapter = new FollowerAdapter(this, model.getFollowerList());
+
+		lvFollowers.setAdapter(adapter);
+		lvFollowers.setOnItemClickListener(new FollowerClickListener());
+
+		GetFollowersTask task = new GetFollowersTask();
+		task.execute();
+
+	}
+
+	public class FollowerClickListener implements OnItemClickListener {
+		/**
+		 * when clicked on a follower, the follower tweet activity will start
+		 * where you can see the follower' tweets
+		 */
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			Intent intent = new Intent(FollowerActivity.this, FollowerTweetActivity.class);
+			Intent intent = new Intent(FollowerActivity.this,
+					FollowerTweetActivity.class);
 			intent.putExtra("position", position);
 			startActivity(intent);
-			
-			
+
 		}
-		
+
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.follower, menu);
-		return true;
-	}
+	/**
+	 * The getFollowTask class for retrieving the followers in a JSONObject
+	 *
+	 */
+	public class GetFollowersTask extends AsyncTask<Void, Integer, String> {
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-	
-		return super.onOptionsItemSelected(item);
-	}
-	
-	
-	
-public class GetFollowersTask extends AsyncTask<Void, Integer, String> {
-		
-	
-		
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-		
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+				.permitAll().build();
 
 		private HttpResponse response;
+
+		/**
+		 * Another thread will handle the httpGet and retrieve the response
+		 */
 		@Override
 		protected String doInBackground(Void... params) {
 			String followersJSON = "";
 			try {
 				HttpClient client = new DefaultHttpClient();
-				
-				HttpGet httpGet = new HttpGet(
-							"https://api.twitter.com/1.1/followers/list.json");
-				
-				
 
-		        // sign the request
-				
-		
-		        consumer.sign(httpGet);
+				HttpGet httpGet = new HttpGet(
+						"https://api.twitter.com/1.1/followers/list.json");
+
+				consumer.sign(httpGet);
 
 				ResponseHandler<String> handler = new BasicResponseHandler();
 				response = client.execute(httpGet);
-			
+
 				followersJSON = handler.handleResponse(response);
-				//System.out.println(followersJSON);
-				
-			
-			} catch (Exception e){
+
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return followersJSON;
-			
-			
+
 		}
 
+		/**
+		 * updates the followers in Model
+		 */
 		@Override
 		protected void onPostExecute(String result) {
-				model.handleFollowers(result);
-			}
+			model.handleFollowers(result);
+		}
 
-	}	
-	
+	}
+
+	/**
+	 * finishes the activity on back press
+	 */
 	@Override
-	public void onBackPressed(){
+	public void onBackPressed() {
 		finish();
 	}
 
+	/**
+	 * Updates the adapter view
+	 */
 	@Override
 	public void update(Observable observable, Object data) {
 		adapter.notifyDataSetChanged();
-		//System.out.println("Updated");
-		
+
 	}
 }

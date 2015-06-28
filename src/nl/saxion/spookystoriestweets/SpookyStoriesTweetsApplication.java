@@ -1,19 +1,27 @@
 package nl.saxion.spookystoriestweets;
 
-import oauth.signpost.OAuth;
+/**	The Application class for The Twitterclient
+ * 	used for retrieving the model for the application
+ * 
+ * @author Doron Hartog & Laurens Martos
+ *
+ */
+
 import android.app.Application;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
 import nl.saxion.spookystoriestweets.model.Model;
 
 public class SpookyStoriesTweetsApplication extends Application {
 	private Model model;
-	
-	public void onCreate(){
+
+	public void onCreate() {
 		model = new Model();
 	}
-	
+
+	/**
+	 * getter for the Model
+	 * 
+	 * @return returns the model of the application
+	 */
 	public Model getModel() {
 		return this.model;
 	}
