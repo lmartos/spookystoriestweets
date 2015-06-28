@@ -62,6 +62,7 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 	private OAuthConsumer consumer;
 	private SpookyStoriesTweetsApplication app;
 	private Model model;
+	private Tweet currentTweet;
 
 	/**
 	 * Constructor for the TwitterAdapter
@@ -73,11 +74,12 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 		super(context, R.layout.listviewitem, listOfTweets);
 		app = (SpookyStoriesTweetsApplication) context.getApplicationContext();
 		model = app.getModel();
+		this.context = context;
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		final Tweet currentTweet = getItem(position);
+		currentTweet = getItem(position);
 		User currentUser = currentTweet.getUser();
 
 		if (convertView == null) {
@@ -118,7 +120,7 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 			@Override
 			public void onClick(View v) {
 				consumer = model.getConsumer();
-				String tweetId = "" + cTweet.getId();
+				String tweetId = cTweet.getIdStr();
 				RetweetTask retweetTask = new RetweetTask();
 				retweetTask.execute(tweetId);
 				notifyDataSetChanged();

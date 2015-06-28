@@ -18,7 +18,7 @@ public class Tweet extends Observable implements Observer {
 	private User user;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private JSONArray hashtags, urls, media;
-	private int tweetId;
+	private String tweetIdStr;
 	/**
 	 * 					The constructor of a Tweet
 	 * 					Builds the Tweet from a JSONObject
@@ -30,7 +30,7 @@ public class Tweet extends Observable implements Observer {
 		user.addObserver(this);
 		tweetedText = tweetObj.getString("text");
 		tweetDate = tweetObj.getString("created_at");
-		tweetId = tweetObj.getInt("id");
+		tweetIdStr = tweetObj.getString("id_str");
 
 		JSONObject entityObj = tweetObj.getJSONObject("entities");
 
@@ -88,7 +88,7 @@ public class Tweet extends Observable implements Observer {
 	 * 			the getter of a twitter id
 	 * @return	returns the tweetId in Integer
 	 */
-	public int getId() {
-		return this.tweetId;
+	public String getIdStr() {
+		return this.tweetIdStr;
 	}
 }
