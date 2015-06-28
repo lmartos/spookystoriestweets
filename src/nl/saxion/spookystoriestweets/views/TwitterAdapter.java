@@ -199,7 +199,7 @@ public class TwitterAdapter extends ArrayAdapter<Tweet> implements Observer {
 				picture = BitmapFactory.decodeStream(input);
 				input.close();
 			} catch (Exception e) {
-				picture = null;
+				picture = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
 				e.printStackTrace();
 			}
 			return picture;
