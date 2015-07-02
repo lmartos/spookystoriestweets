@@ -220,6 +220,7 @@ public class MainActivity extends Activity {
 				edit.remove(OAuth.OAUTH_TOKEN_SECRET);
 				edit.commit();
 				item.setTitle("Login");
+				model.setLoggedIn(false);
 				return true;
 			} else {
 				Intent i = new Intent(getApplicationContext(),
